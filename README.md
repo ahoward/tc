@@ -154,7 +154,9 @@ sudo pacman -S jq
 
 ### install tc
 
-**option 1: add to PATH (development)**
+**option 1: add to PATH (recommended for development)**
+
+Best for trying out tc or active development.
 
 ```bash
 git clone https://github.com/ahoward/tc.git
@@ -163,7 +165,12 @@ export PATH="$PWD/bin:$PATH"
 echo 'export PATH="'$PWD'/bin:$PATH"' >> ~/.bashrc  # persist
 ```
 
+*Pros: Easy to update (git pull), no sudo required, keeps everything in one location*
+*Use case: Development, testing, personal projects*
+
 **option 2: symlink to /usr/local/bin**
+
+Lightweight system-wide installation.
 
 ```bash
 git clone https://github.com/ahoward/tc.git
@@ -171,13 +178,23 @@ cd tc
 sudo ln -s "$PWD/bin/tc" /usr/local/bin/tc
 ```
 
-**option 3: copy to /usr/local/bin**
+*Pros: System-wide access, still connected to repo for updates*
+*Note: Library files remain in cloned directory - don't delete the repo*
+*Use case: Personal machines, development systems*
+
+**option 3: copy to /usr/local/bin (recommended for production)**
+
+Full system installation, standalone.
 
 ```bash
 git clone https://github.com/ahoward/tc.git
 cd tc
 sudo cp -r bin lib /usr/local/
 ```
+
+*Pros: True system install, works even if you delete the clone, no git dependency*
+*Cons: Must manually update (copy again) when upgrading*
+*Use case: Production servers, CI/CD systems, containers*
 
 ### verify installation
 
