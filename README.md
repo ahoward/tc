@@ -20,8 +20,16 @@ language-agnostic testing for unix hackers
 ## quickstart
 
 ```bash
-# add to PATH
+# clone and install
+git clone https://github.com/ahoward/tc.git
+cd tc
 export PATH="$PWD/bin:$PATH"
+
+# generate your first test
+tc new tests/my-feature
+
+# run it (will fail with NOT_IMPLEMENTED)
+tc run tests/my-feature
 
 # run the hello-world example
 tc run examples/hello-world
@@ -45,9 +53,31 @@ tc is a dead-simple testing framework that lets you:
 - **language-agnostic**: same tests work for bash, python, rust, go, whatever
 - **unix**: text streams, composable, do one thing well
 
+## commands
+
+```bash
+# test execution
+tc run <suite-path>         # run single test suite
+tc run <path> --all         # run all suites in directory tree
+tc run <path> --tags TAG    # run suites matching tag
+
+# test generation (new!)
+tc new <test-path>          # generate new test suite
+tc init [directory]         # initialize test directory with README
+
+# discovery & metadata
+tc list [path]              # list all test suites with metadata
+tc tags [path]              # show all available tags
+tc explain <suite>          # explain what a test suite does
+
+# info
+tc --version                # show version
+tc --help                   # show help
+```
+
 ## documentation
 
-**[→ read the full docs](docs/readme.md)**
+**[→ full docs](docs/readme.md)** | **[→ tc new guide](docs/tc-new.md)**
 
 ## example
 
@@ -66,30 +96,94 @@ tc run my-feature  # ✓ pass or ✗ fail
 
 ## features
 
+**test execution:**
 - [x] run single test suite
 - [x] semantic json comparison (order-independent)
 - [x] timeout management
 - [x] result persistence (.tc-result files)
 - [x] hierarchical test discovery (--all flag)
+- [x] tag-based filtering (--tags flag)
+
+**test generation:**
+- [x] scaffold generation (`tc new`)
+- [x] test directory initialization (`tc init`)
+- [x] metadata flags (--tags, --priority, --description)
+- [x] template system (--from, --list-examples)
+- [x] TDD workflow (tests fail until implemented)
+
+**discovery & metadata:**
+- [x] list all tests (`tc list`)
+- [x] show available tags (`tc tags`)
+- [x] explain test suite (`tc explain`)
+- [x] AI-friendly metadata format
+
+**quality:**
 - [x] dogfooding (tc tests itself!)
+
+**roadmap:**
 - [ ] parallel execution
 - [ ] pattern-based selection
 
 ## installation
 
+### prerequisites
+
+- bash 4.0+ (or compatible shell)
+- jq (for json processing)
+
+### install jq
+
 ```bash
-# clone
-git clone https://github.com/ahoward/tc
+# macos
+brew install jq
+
+# ubuntu/debian
+sudo apt-get install jq
+
+# fedora/rhel
+sudo dnf install jq
+
+# arch
+sudo pacman -S jq
+
+# or download from https://jqlang.github.io/jq/
+```
+
+### install tc
+
+**option 1: add to PATH (development)**
+
+```bash
+git clone https://github.com/ahoward/tc.git
 cd tc
-
-# install jq if needed
-brew install jq  # or apt/pacman/etc
-
-# add to PATH or symlink
 export PATH="$PWD/bin:$PATH"
+echo 'export PATH="'$PWD'/bin:$PATH"' >> ~/.bashrc  # persist
+```
 
-# verify
+**option 2: symlink to /usr/local/bin**
+
+```bash
+git clone https://github.com/ahoward/tc.git
+cd tc
+sudo ln -s "$PWD/bin/tc" /usr/local/bin/tc
+```
+
+**option 3: copy to /usr/local/bin**
+
+```bash
+git clone https://github.com/ahoward/tc.git
+cd tc
+sudo cp -r bin lib /usr/local/
+```
+
+### verify installation
+
+```bash
 tc --version
+# tc v1.0.0 - island hopper
+
+tc --help
+# shows available commands
 ```
 
 ## license
