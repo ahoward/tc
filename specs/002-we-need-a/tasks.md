@@ -94,15 +94,15 @@
 
 ### Implementation for User Story 3
 
-- [ ] T027 [US3] Create lib/core/templates.sh for template discovery and management
-- [ ] T028 [US3] Implement tc_discover_templates() in lib/core/templates.sh (find built-in + examples)
-- [ ] T029 [US3] Implement tc_list_templates() in lib/core/templates.sh (format output for --list-examples)
-- [ ] T030 [US3] Implement tc_validate_template_exists() in lib/core/templates.sh (check if template exists)
-- [ ] T031 [US3] Implement tc_load_template_files() in lib/core/templates.sh (read template files, detect if heredoc or file-based)
-- [ ] T032 [US3] Update tc_generate_from_template() in lib/core/generator.sh to support template parameter
-- [ ] T033 [US3] Add --from flag parsing to "new" command in bin/tc
-- [ ] T034 [US3] Add --list-examples command handler to bin/tc (call tc_list_templates)
-- [ ] T035 [US3] Source lib/core/templates.sh in bin/tc
+- [x] T027 [US3] Create lib/core/templates.sh for template discovery and management
+- [x] T028 [US3] Implement tc_discover_templates() in lib/core/templates.sh (find built-in + examples)
+- [x] T029 [US3] Implement tc_list_templates() in lib/core/templates.sh (format output for --list-examples)
+- [x] T030 [US3] Implement tc_validate_template_exists() in lib/core/templates.sh (check if template exists)
+- [x] T031 [US3] Implement tc_load_template_files() in lib/core/templates.sh (read template files, detect if heredoc or file-based)
+- [x] T032 [US3] Update tc_generate_from_template() in lib/core/generator.sh to support template parameter
+- [x] T033 [US3] Add --from flag parsing to "new" command in bin/tc
+- [x] T034 [US3] Add --list-examples command handler to bin/tc (call tc_list_templates)
+- [x] T035 [US3] Source lib/core/templates.sh in bin/tc
 
 **Checkpoint**: Template discovery works, --from flag generates from examples, --list-examples shows available templates
 

@@ -199,35 +199,38 @@ tc_build_template_variables() {
     export TC_VAR_RUN_WHEN="$run_when"
 }
 
-# T013: generate from template (main generation orchestrator)
+# T013/T032: generate from template (main generation orchestrator)
 tc_generate_from_template() {
     local test_path="$1"
-    local template_dir="${2:-default}"
+    local template_name="${2:-default}"
 
-    # resolve absolute paths
+    # source templates.sh for template discovery (T035)
     local script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-    local templates_root="$script_dir/../templates"
+    source "$script_dir/templates.sh"
 
-    # for now, only support "default" template (US3 will add more)
-    if [ "$template_dir" != "default" ]; then
-        tc_warn "Template '$template_dir' not yet supported, using 'default'"
-        template_dir="default"
+    # load template info (T031)
+    local template_info=$(tc_load_template_files "$template_name")
+    if [ $? -ne 0 ]; then
+        return 1
     fi
 
-    local template_path="$templates_root/$template_dir"
+    local template_path=$(echo "$template_info" | grep '^template_path=' | cut -d= -f2-)
+    local template_type=$(echo "$template_info" | grep '^template_type=' | cut -d= -f2-)
 
     if [ ! -d "$template_path" ]; then
         tc_error "Template not found: $template_path"
         return 1
     fi
 
+    tc_debug "Using $template_type template: $template_name from $template_path"
+
     # build template variables (T023)
     tc_build_template_variables "$test_path"
 
     # generate all files
-    tc_generate_run_script "$test_path" "$template_path" || return 1
-    tc_generate_readme "$test_path" "$template_path" || return 1
-    tc_generate_data_files "$test_path" "$template_path" || return 1
+    tc_generate_run_script "$test_path" "$template_path" "$template_type" || return 1
+    tc_generate_readme "$test_path" "$template_path" "$template_type" || return 1
+    tc_generate_data_files "$test_path" "$template_path" "$template_type" || return 1
 
     return 0
 }
@@ -261,25 +264,35 @@ _tc_substitute_variables() {
 tc_generate_run_script() {
     local test_path="$1"
     local template_path="$2"
-    local run_template="$template_path/run.template"
+    local template_type="${3:-builtin}"
 
-    if [ ! -f "$run_template" ]; then
-        tc_error "Run template not found: $run_template"
-        return 1
+    # for builtin templates, use .template files
+    # for example templates, copy the run script directly
+    if [ "$template_type" = "builtin" ]; then
+        local run_template="$template_path/run.template"
+
+        if [ ! -f "$run_template" ]; then
+            tc_error "Run template not found: $run_template"
+            return 1
+        fi
+
+        # read template
+        local template_content=$(cat "$run_template")
+
+        # use exported variables from tc_build_template_variables
+        local output=$(_tc_substitute_variables "$template_content" \
+            "$TC_VAR_TEST_NAME" "$TC_VAR_TEST_PATH" "$TC_VAR_TIMESTAMP" \
+            "$TC_VAR_DESCRIPTION" "$TC_VAR_EXTRA_TAGS" "$TC_VAR_DEPENDENCIES" \
+            "$TC_VAR_PRIORITY" "$TC_VAR_RUN_WHEN")
+
+        # write run script
+        local run_script="$test_path/run"
+        echo "$output" > "$run_script" || return 1
+    else
+        # example template: copy run script directly
+        local run_script="$test_path/run"
+        cp "$template_path/run" "$run_script" || return 1
     fi
-
-    # read template
-    local template_content=$(cat "$run_template")
-
-    # use exported variables from tc_build_template_variables
-    local output=$(_tc_substitute_variables "$template_content" \
-        "$TC_VAR_TEST_NAME" "$TC_VAR_TEST_PATH" "$TC_VAR_TIMESTAMP" \
-        "$TC_VAR_DESCRIPTION" "$TC_VAR_EXTRA_TAGS" "$TC_VAR_DEPENDENCIES" \
-        "$TC_VAR_PRIORITY" "$TC_VAR_RUN_WHEN")
-
-    # write run script
-    local run_script="$test_path/run"
-    echo "$output" > "$run_script" || return 1
 
     # make executable
     tc_set_executable_permission "$run_script" || return 1
@@ -292,25 +305,54 @@ tc_generate_run_script() {
 tc_generate_readme() {
     local test_path="$1"
     local template_path="$2"
-    local readme_template="$template_path/README.template"
+    local template_type="${3:-builtin}"
 
-    if [ ! -f "$readme_template" ]; then
-        tc_error "README template not found: $readme_template"
-        return 1
+    if [ "$template_type" = "builtin" ]; then
+        local readme_template="$template_path/README.template"
+
+        if [ ! -f "$readme_template" ]; then
+            tc_error "README template not found: $readme_template"
+            return 1
+        fi
+
+        # read template
+        local template_content=$(cat "$readme_template")
+
+        # use exported variables from tc_build_template_variables (includes custom metadata)
+        local output=$(_tc_substitute_variables "$template_content" \
+            "$TC_VAR_TEST_NAME" "$TC_VAR_TEST_PATH" "$TC_VAR_TIMESTAMP" \
+            "$TC_VAR_DESCRIPTION" "$TC_VAR_EXTRA_TAGS" "$TC_VAR_DEPENDENCIES" \
+            "$TC_VAR_PRIORITY" "$TC_VAR_RUN_WHEN")
+
+        # write README
+        local readme="$test_path/README.md"
+        echo "$output" > "$readme" || return 1
+    else
+        # example template: copy README if exists, or generate minimal one
+        local readme="$test_path/README.md"
+        if [ -f "$template_path/README.md" ]; then
+            cp "$template_path/README.md" "$readme" || return 1
+        else
+            # generate minimal README for example
+            cat > "$readme" << EOF
+# $TC_VAR_TEST_NAME
+
+**tags**: \`pending\`, \`new\`$TC_VAR_EXTRA_TAGS
+**what**: $TC_VAR_DESCRIPTION
+**depends**: $TC_VAR_DEPENDENCIES
+**priority**: $TC_VAR_PRIORITY
+
+## description
+
+Test based on example: $(basename "$template_path")
+
+## ai notes
+
+run this when: $TC_VAR_RUN_WHEN
+skip this when: test logic not yet implemented
+EOF
+        fi
     fi
-
-    # read template
-    local template_content=$(cat "$readme_template")
-
-    # use exported variables from tc_build_template_variables (includes custom metadata)
-    local output=$(_tc_substitute_variables "$template_content" \
-        "$TC_VAR_TEST_NAME" "$TC_VAR_TEST_PATH" "$TC_VAR_TIMESTAMP" \
-        "$TC_VAR_DESCRIPTION" "$TC_VAR_EXTRA_TAGS" "$TC_VAR_DEPENDENCIES" \
-        "$TC_VAR_PRIORITY" "$TC_VAR_RUN_WHEN")
-
-    # write README
-    local readme="$test_path/README.md"
-    echo "$output" > "$readme" || return 1
 
     tc_debug "Generated README: $readme"
     return 0
@@ -320,20 +362,37 @@ tc_generate_readme() {
 tc_generate_data_files() {
     local test_path="$1"
     local template_path="$2"
-    local input_template="$template_path/input.template"
-    local expected_template="$template_path/expected.template"
-
-    if [ ! -f "$input_template" ] || [ ! -f "$expected_template" ]; then
-        tc_error "Data templates not found in: $template_path"
-        return 1
-    fi
+    local template_type="${3:-builtin}"
 
     # data directory already created by tc_create_directory_structure
     local data_dir="$test_path/data/example-scenario"
 
-    # copy template files (these are static JSON, no substitution needed)
-    cp "$input_template" "$data_dir/input.json" || return 1
-    cp "$expected_template" "$data_dir/expected.json" || return 1
+    if [ "$template_type" = "builtin" ]; then
+        local input_template="$template_path/input.template"
+        local expected_template="$template_path/expected.template"
+
+        if [ ! -f "$input_template" ] || [ ! -f "$expected_template" ]; then
+            tc_error "Data templates not found in: $template_path"
+            return 1
+        fi
+
+        # copy template files (these are static JSON, no substitution needed)
+        cp "$input_template" "$data_dir/input.json" || return 1
+        cp "$expected_template" "$data_dir/expected.json" || return 1
+    else
+        # example template: copy data directory if exists
+        if [ -d "$template_path/data" ]; then
+            # copy all data from example
+            cp -r "$template_path/data/"* "$test_path/data/" 2>/dev/null || true
+        fi
+
+        # ensure at least example-scenario exists
+        if [ ! -d "$data_dir" ]; then
+            mkdir -p "$data_dir"
+            echo '{"TODO": "Add input data"}' > "$data_dir/input.json"
+            echo '{"TODO": "Add expected output"}' > "$data_dir/expected.json"
+        fi
+    fi
 
     tc_debug "Generated data files in: $data_dir"
     return 0

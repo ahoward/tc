@@ -298,9 +298,23 @@ tc_init_command() {
     exit $?
 }
 
-# T025/T026: new command - generate test suite with optional flags
+# T034: list examples command
+tc_list_examples_command() {
+    # T035: source templates.sh
+    source "$TC_ROOT/lib/core/templates.sh"
+    tc_list_templates
+    exit 0
+}
+
+# T025/T026/T033: new command - generate test suite with optional flags
 tc_new_command() {
     local test_path=""
+    local template_name="default"
+
+    # T033: check for --list-examples first
+    if [ "$1" = "--list-examples" ]; then
+        tc_list_examples_command
+    fi
 
     # T025: parse optional flags
     # reset global variables
@@ -325,6 +339,15 @@ tc_new_command() {
                 TC_GEN_DEPENDS="$2"
                 shift 2
                 ;;
+            --from)
+                # T033: template selection
+                template_name="$2"
+                shift 2
+                ;;
+            --list-examples)
+                # handled above
+                tc_list_examples_command
+                ;;
             --help)
                 # T026: show help for new command
                 cat << 'EOF'
@@ -332,18 +355,23 @@ tc new - generate test suite scaffolding
 
 usage:
     tc new <test-path> [options]
+    tc new --list-examples
 
 options:
+    --from <template>        use specific template (default: "default")
     --tags <tag1,tag2>       comma-separated tags (e.g., "auth,api")
     --priority <level>       priority: high, medium (default), low
     --description <text>     test description
     --depends <paths>        space-separated dependency paths
+    --list-examples          show available templates
     --help                   show this help
 
 examples:
     tc new tests/my-feature
     tc new tests/auth/login --tags "auth,api" --priority high
     tc new tests/checkout --description "Test checkout flow" --depends "tests/cart tests/auth"
+    tc new tests/my-calc --from hello-world
+    tc new --list-examples
 
 the generated test will fail until you implement it - that's the point! 🚁
 EOF
@@ -402,8 +430,8 @@ EOF
         exit 1
     fi
 
-    # generate from template (default template for US1)
-    if ! tc_generate_from_template "$test_path" "default"; then
+    # generate from template (T033: use selected template)
+    if ! tc_generate_from_template "$test_path" "$template_name"; then
         tc_error "Failed to generate test suite"
         exit 1
     fi
