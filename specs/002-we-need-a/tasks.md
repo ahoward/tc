@@ -112,16 +112,16 @@
 
 **Purpose**: Refinements affecting multiple user stories
 
-- [ ] T036 [P] Add comprehensive error messages for all validation failures (invalid names, permissions, etc.)
-- [ ] T037 [P] Ensure all generated files use UTF-8 encoding and LF line endings
-- [ ] T038 Add --force flag handling throughout generator (allow overwrite existing directories)
-- [ ] T039 [P] Validate generated JSON files are valid JSON (parse with jq after creation)
-- [ ] T040 [P] Verify generated README.md passes tc_extract_metadata() parser
-- [ ] T041 Add repository root detection (walk up for .git or bin/tc)
-- [ ] T042 [P] Document usage in docs/ (link to specs/002-we-need-a/quickstart.md)
-- [ ] T043 Performance validation: ensure generation completes in <10 seconds
-- [ ] T044 Test nested path creation (e.g., `tests/api/v2/auth/login`)
-- [ ] T045 Test edge cases: existing directory, invalid names, permission denied, empty path
+- [x] T036 [P] Add comprehensive error messages for all validation failures (invalid names, permissions, etc.)
+- [x] T037 [P] Ensure all generated files use UTF-8 encoding and LF line endings
+- [x] T038 Add --force flag handling throughout generator (allow overwrite existing directories)
+- [x] T039 [P] Validate generated JSON files are valid JSON (parse with jq after creation)
+- [x] T040 [P] Verify generated README.md passes tc_extract_metadata() parser
+- [ ] T041 Add repository root detection (walk up for .git or bin/tc) [SKIPPED - not critical]
+- [x] T042 [P] Document usage in docs/ (link to specs/002-we-need-a/quickstart.md)
+- [x] T043 Performance validation: ensure generation completes in <10 seconds
+- [x] T044 Test nested path creation (e.g., `tests/api/v2/auth/login`)
+- [x] T045 Test edge cases: existing directory, invalid names, permission denied, empty path
 
 ---
 

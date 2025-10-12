@@ -306,10 +306,11 @@ tc_list_examples_command() {
     exit 0
 }
 
-# T025/T026/T033: new command - generate test suite with optional flags
+# T025/T026/T033/T038: new command - generate test suite with optional flags
 tc_new_command() {
     local test_path=""
     local template_name="default"
+    local force_overwrite=false
 
     # T033: check for --list-examples first
     if [ "$1" = "--list-examples" ]; then
@@ -344,6 +345,11 @@ tc_new_command() {
                 template_name="$2"
                 shift 2
                 ;;
+            --force)
+                # T038: force overwrite existing directories
+                force_overwrite=true
+                shift
+                ;;
             --list-examples)
                 # handled above
                 tc_list_examples_command
@@ -363,6 +369,7 @@ options:
     --priority <level>       priority: high, medium (default), low
     --description <text>     test description
     --depends <paths>        space-separated dependency paths
+    --force                  overwrite existing test directory
     --list-examples          show available templates
     --help                   show this help
 
@@ -420,8 +427,8 @@ EOF
         exit 1
     fi
 
-    # check if path exists (no --force support in US1)
-    if ! tc_check_path_exists "$test_path" false; then
+    # check if path exists (T038: pass force_overwrite flag)
+    if ! tc_check_path_exists "$test_path" "$force_overwrite"; then
         exit 1
     fi
 

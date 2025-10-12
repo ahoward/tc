@@ -354,6 +354,19 @@ EOF
         fi
     fi
 
+    # T040: verify README passes tc_extract_metadata() parser
+    local script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+    source "$script_dir/metadata.sh" 2>/dev/null || true
+
+    if type tc_extract_metadata >/dev/null 2>&1; then
+        local metadata=$(tc_extract_metadata "$test_path" 2>/dev/null)
+        if [ -z "$metadata" ]; then
+            tc_warn "Generated README.md may not be properly formatted for metadata extraction"
+        else
+            tc_debug "README metadata validation passed"
+        fi
+    fi
+
     tc_debug "Generated README: $readme"
     return 0
 }
@@ -379,6 +392,14 @@ tc_generate_data_files() {
         # copy template files (these are static JSON, no substitution needed)
         cp "$input_template" "$data_dir/input.json" || return 1
         cp "$expected_template" "$data_dir/expected.json" || return 1
+
+        # T039: validate generated JSON files
+        if ! jq empty "$data_dir/input.json" 2>/dev/null; then
+            tc_warn "Generated input.json is not valid JSON"
+        fi
+        if ! jq empty "$data_dir/expected.json" 2>/dev/null; then
+            tc_warn "Generated expected.json is not valid JSON"
+        fi
     else
         # example template: copy data directory if exists
         if [ -d "$template_path/data" ]; then
@@ -391,6 +412,18 @@ tc_generate_data_files() {
             mkdir -p "$data_dir"
             echo '{"TODO": "Add input data"}' > "$data_dir/input.json"
             echo '{"TODO": "Add expected output"}' > "$data_dir/expected.json"
+        fi
+
+        # T039: validate generated JSON files (only if they were just created)
+        if [ -f "$data_dir/input.json" ]; then
+            if ! jq empty "$data_dir/input.json" 2>/dev/null; then
+                tc_warn "Generated input.json is not valid JSON"
+            fi
+        fi
+        if [ -f "$data_dir/expected.json" ]; then
+            if ! jq empty "$data_dir/expected.json" 2>/dev/null; then
+                tc_warn "Generated expected.json is not valid JSON"
+            fi
         fi
     fi
 
