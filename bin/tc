@@ -19,6 +19,7 @@ source "$TC_ROOT/lib/core/discovery.sh"
 source "$TC_ROOT/lib/core/executor.sh"
 source "$TC_ROOT/lib/utils/reporter.sh"
 source "$TC_ROOT/lib/core/metadata.sh"
+source "$TC_ROOT/lib/core/generator.sh"
 
 # show version
 show_version() {
@@ -37,6 +38,8 @@ usage:
     tc run <suite-path>         run a single test suite
     tc run <path> --all         run all suites in directory tree
     tc run <path> --tags TAG    run suites matching tag
+    tc init [directory]         initialize test directory with README
+    tc new <test-path>          generate a new test suite
     tc list [path]              list all test suites with metadata
     tc tags [path]              show all available tags
     tc explain <suite>          explain what a test suite does
@@ -47,6 +50,8 @@ examples:
     tc run ./tests/auth/login          # run one suite
     tc run ./tests --all               # run all suites
     tc run tests --tags auth           # run all auth tests
+    tc init tests                      # initialize tests/ directory
+    tc new tests/my-feature            # generate new test suite
     tc list tests                      # list all tests in tests/
     tc tags                            # show all tags
     tc explain tests/unit/json         # explain test suite
@@ -285,6 +290,62 @@ tc_explain_command() {
     tc_explain_suite "$suite_path"
 }
 
+# init command - initialize test directory
+tc_init_command() {
+    local target_dir="${1:-tests}"
+
+    tc_init_directory "$target_dir"
+    exit $?
+}
+
+# T019: new command - generate test suite
+tc_new_command() {
+    local test_path="$1"
+
+    # validate test path provided
+    if [ -z "$test_path" ]; then
+        tc_error "usage: tc new <test-path>"
+        tc_error ""
+        tc_error "example: tc new tests/my-feature"
+        exit 1
+    fi
+
+    # T020: basic error handling
+    # parse test path to get test name
+    local path_info=$(tc_parse_test_path "$test_path")
+    if [ $? -ne 0 ]; then
+        exit 1
+    fi
+
+    local test_name=$(echo "$path_info" | grep '^test_name=' | cut -d= -f2-)
+
+    # validate test name
+    if ! tc_validate_test_name "$test_name"; then
+        exit 1
+    fi
+
+    # check if path exists (no --force support in US1)
+    if ! tc_check_path_exists "$test_path" false; then
+        exit 1
+    fi
+
+    # create directory structure
+    if ! tc_create_directory_structure "$test_path"; then
+        exit 1
+    fi
+
+    # generate from template (default template for US1)
+    if ! tc_generate_from_template "$test_path" "default"; then
+        tc_error "Failed to generate test suite"
+        exit 1
+    fi
+
+    # display success message
+    tc_display_success_message "$test_path"
+
+    exit 0
+}
+
 # main entry point
 main() {
     case "${1:-}" in
@@ -297,6 +358,14 @@ main() {
         run)
             shift  # remove 'run' from args
             tc_run_command "$@"
+            ;;
+        init)
+            shift  # remove 'init' from args
+            tc_init_command "$@"
+            ;;
+        new)
+            shift  # remove 'new' from args
+            tc_new_command "$@"
             ;;
         list)
             shift

@@ -1,0 +1,35 @@
+# ${TEST_NAME}
+
+**tags**: \`pending\`, \`new\`${EXTRA_TAGS}
+**what**: ${DESCRIPTION}
+**depends**: ${DEPENDENCIES}
+**priority**: ${PRIORITY}
+
+## description
+
+TODO: Add detailed description of what this test validates.
+
+Key areas to document:
+- What feature/functionality is being tested
+- What inputs are expected
+- What outputs should be produced
+- Any special setup or prerequisites
+
+## scenarios
+
+- \`example-scenario\` - TODO: Describe what this scenario tests
+
+## ai notes
+
+run this when: ${RUN_WHEN}
+skip this when: test logic not yet implemented (pending)
+after this: TODO: List related tests to run after this passes
+
+## next steps
+
+1. Edit the \`run\` script to implement test logic
+2. Update \`data/example-scenario/input.json\` with realistic test data
+3. Update \`data/example-scenario/expected.json\` with expected output
+4. Add more scenarios by creating new directories under \`data/\`
+5. Run \`tc run ${TEST_PATH}\` to verify implementation
+6. Update this README with actual test details
