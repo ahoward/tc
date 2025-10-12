@@ -50,6 +50,22 @@ EOF
 # run command - execute test suite(s)
 tc_run_command() {
     local suite_path="${1:-.}"
+    local run_all=false
+
+    # parse flags
+    shift
+    while [ $# -gt 0 ]; do
+        case "$1" in
+            --all)
+                run_all=true
+                shift
+                ;;
+            *)
+                tc_error "unknown flag: $1"
+                exit 1
+                ;;
+        esac
+    done
 
     # check if jq is available
     if ! tc_check_jq; then
@@ -60,6 +76,12 @@ tc_run_command() {
     if [ ! -e "$suite_path" ]; then
         tc_error "path not found: $suite_path"
         exit 1
+    fi
+
+    # run all suites in directory tree
+    if [ "$run_all" = true ]; then
+        tc_run_all_suites "$suite_path"
+        exit $?
     fi
 
     # check if it's a test suite
@@ -95,6 +117,82 @@ tc_run_command() {
         tc_error "test suites must have an executable 'run' file"
         exit 1
     fi
+}
+
+# run all test suites in directory tree
+tc_run_all_suites() {
+    local root_path="$1"
+
+    tc_info "discovering test suites in: $root_path"
+
+    # discover all suites
+    local suites=$(tc_discover_suites_recursive "$root_path")
+    local suite_count=$(echo "$suites" | wc -l)
+
+    if [ -z "$suites" ]; then
+        tc_error "no test suites found in: $root_path"
+        exit 1
+    fi
+
+    tc_info "found $suite_count suite(s)"
+    echo ""
+
+    # aggregate results
+    local total_passed=0
+    local total_failed=0
+    local total_errors=0
+    local overall_exit=0
+
+    # run each suite
+    while read -r suite_dir; do
+        [ -z "$suite_dir" ] && continue
+
+        local suite_name=$(tc_suite_relative_path "$suite_dir" "$root_path")
+        tc_info "running: $suite_name"
+
+        # execute suite
+        local result=$(tc_execute_suite "$suite_dir")
+        local exit_code=$?
+
+        # parse results
+        local metadata="${result%%:::*}"
+        local rest="${result#*:::}"
+        IFS='|' read -r passed failed errors <<< "$metadata"
+
+        # extract result details
+        local results=()
+        while IFS= read -r line; do
+            [ -n "$line" ] && results+=("$line")
+        done <<< "$rest"
+
+        # report suite results
+        tc_report_suite "$suite_dir" "$passed" "$failed" "$errors" "${results[@]}"
+
+        # write results to file
+        tc_write_results "$suite_dir" "${results[@]}"
+
+        # aggregate
+        total_passed=$((total_passed + passed))
+        total_failed=$((total_failed + failed))
+        total_errors=$((total_errors + errors))
+
+        if [ $exit_code -ne 0 ]; then
+            overall_exit=1
+        fi
+
+        echo ""
+    done <<< "$suites"
+
+    # print overall summary
+    echo "===================================="
+    echo "overall results"
+    echo "===================================="
+    echo ""
+    echo "suites run: $suite_count"
+    tc_report_summary "$total_passed" "$total_failed" "$total_errors"
+    echo ""
+
+    return $overall_exit
 }
 
 # main entry point

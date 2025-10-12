@@ -1,0 +1,54 @@
+#!/usr/bin/env bash
+# integration test: test hierarchical execution with --all flag
+# verifies that tc can discover and run multiple suites
+
+set -e
+
+input_file="$1"
+
+# source tc root
+TC_ROOT="$(cd "$(dirname "$0")/../../.." && pwd)"
+
+# parse input
+num_suites=$(jq -r '.num_suites' "$input_file")
+
+# create temporary hierarchical structure
+tmpdir=$(mktemp -d)
+trap "rm -rf $tmpdir" EXIT
+
+# create multiple test suites
+for i in $(seq 1 "$num_suites"); do
+    suite_dir="$tmpdir/suite-$i"
+    mkdir -p "$suite_dir/data/scenario1"
+
+    # create runner
+    cat > "$suite_dir/run" << 'RUNNER_EOF'
+#!/usr/bin/env bash
+input_file="$1"
+echo '{"status": "ok"}'
+RUNNER_EOF
+    chmod +x "$suite_dir/run"
+
+    # create test data
+    echo '{"test": true}' > "$suite_dir/data/scenario1/input.json"
+    echo '{"status": "ok"}' > "$suite_dir/data/scenario1/expected.json"
+done
+
+# run tc --all on the directory
+output=$("$TC_ROOT/bin/tc" run "$tmpdir" --all 2>&1)
+
+# check that it found all suites
+if echo "$output" | grep -q "found $num_suites suite(s)"; then
+    found_count="correct"
+else
+    found_count="incorrect"
+fi
+
+# check that all passed
+if echo "$output" | grep -q "all $num_suites tests passed"; then
+    result="pass"
+else
+    result="fail"
+fi
+
+jq -n --arg result "$result" --arg found "$found_count" '{result: $result, found_count: $found}'
