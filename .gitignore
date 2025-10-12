@@ -1,0 +1,30 @@
+# tc framework - test result files
+**/.tc-result
+**/.tc-cache
+*.tc-tmp
+
+# common temp files
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+
+# editor directories
+.vscode/
+.idea/
+*.sublime-*
+
+# logs
+*.log
+logs/
+
+# test artifacts
+coverage/
+.coverage
+htmlcov/
+
+# os files
+.Trash-*/
+.fseventsd/
+.Spotlight-V100/

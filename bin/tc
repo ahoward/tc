@@ -1,0 +1,120 @@
+#!/usr/bin/env bash
+# tc - theodore calvin's testing framework 🚁
+# language-agnostic test runner inspired by the helicopter pilot himself
+
+set -e
+
+# version info
+TC_VERSION="1.0.0"
+TC_CODENAME="island hopper"
+
+# find tc root directory
+TC_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+
+# source core libraries
+source "$TC_ROOT/lib/config/defaults.sh"
+source "$TC_ROOT/lib/utils/log.sh"
+source "$TC_ROOT/lib/utils/json.sh"
+source "$TC_ROOT/lib/core/discovery.sh"
+source "$TC_ROOT/lib/core/executor.sh"
+source "$TC_ROOT/lib/utils/reporter.sh"
+
+# show version
+show_version() {
+    echo "tc v${TC_VERSION} - ${TC_CODENAME}"
+    echo "theodore calvin's language-agnostic testing framework"
+    echo ""
+    echo "🚁 testing any language, anywhere"
+}
+
+# show help
+show_help() {
+    cat << 'EOF'
+tc - theodore calvin's testing framework 🚁
+
+usage:
+    tc run <suite-path>         run a single test suite
+    tc run <path> --all         run all suites in directory tree
+    tc --version                show version info
+    tc --help                   show this help
+
+examples:
+    tc run ./tests/auth/login          # run one suite
+    tc run ./tests --all               # run all suites
+    tc run tests --all --parallel=4    # parallel execution
+
+made with ☕ and helicopters
+EOF
+}
+
+# run command - execute test suite(s)
+tc_run_command() {
+    local suite_path="${1:-.}"
+
+    # check if jq is available
+    if ! tc_check_jq; then
+        exit 1
+    fi
+
+    # check if path exists
+    if [ ! -e "$suite_path" ]; then
+        tc_error "path not found: $suite_path"
+        exit 1
+    fi
+
+    # check if it's a test suite
+    if tc_is_test_suite "$suite_path"; then
+        tc_info "running suite: $suite_path"
+
+        # execute suite
+        local result=$(tc_execute_suite "$suite_path")
+        local exit_code=$?
+
+        # parse results (format: passed|failed|errors:::result_line1\nresult_line2\n...)
+        local metadata="${result%%:::*}"
+        local rest="${result#*:::}"
+
+        IFS='|' read -r passed failed errors <<< "$metadata"
+
+        # extract result details
+        local results=()
+        while IFS= read -r line; do
+            [ -n "$line" ] && results+=("$line")
+        done <<< "$rest"
+
+        # report results
+        tc_report_suite "$suite_path" "$passed" "$failed" "$errors" "${results[@]}"
+
+        # write results to file
+        tc_write_results "$suite_path" "${results[@]}"
+
+        # exit with appropriate code
+        exit $exit_code
+    else
+        tc_error "not a test suite: $suite_path"
+        tc_error "test suites must have an executable 'run' file"
+        exit 1
+    fi
+}
+
+# main entry point
+main() {
+    case "${1:-}" in
+        --version|-v)
+            show_version
+            ;;
+        --help|-h|help)
+            show_help
+            ;;
+        run)
+            shift  # remove 'run' from args
+            tc_run_command "$@"
+            ;;
+        *)
+            show_help
+            exit 1
+            ;;
+    esac
+}
+
+main "$@"
