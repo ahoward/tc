@@ -2,6 +2,12 @@
 
 language-agnostic testing for unix hackers
 
+<p align="center">
+  <img src="docs/tc.jpg" alt="Theodore Calvin - the man, the legend" width="400">
+  <br>
+  <em>theodore "tc" calvin - helicopter pilot, testing framework namesake, legend</em>
+</p>
+
 ```
      _____
     /     \      tc v1.0.0 - island hopper
@@ -69,7 +75,7 @@ tc run my-feature  # ✓ pass or ✗ fail
 
 ```bash
 # clone
-git clone https://github.com/you/tc
+git clone https://github.com/ahoward/tc
 cd tc
 
 # install jq if needed

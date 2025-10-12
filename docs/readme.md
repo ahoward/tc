@@ -3,6 +3,12 @@
 > "i know what you're thinking... and you're right."
 > — theodore "tc" calvin, test pilot extraordinaire
 
+<p align="center">
+  <img src="tc.jpg" alt="Theodore Calvin - the man, the legend" width="400">
+  <br>
+  <em>meet theodore "tc" calvin - vietnam vet, helicopter pilot, best friend a guy could have</em>
+</p>
+
 **tc** is a language-agnostic testing framework for unix hackers who value simplicity over complexity, portability over dependencies, and helicopters over... well, everything else.
 
 ```
@@ -30,7 +36,7 @@ install tc in <2 minutes:
 
 ```bash
 # clone the repo
-git clone https://github.com/you/tc
+git clone https://github.com/ahoward/tc
 cd tc
 
 # add to PATH (or symlink bin/tc to /usr/local/bin)
@@ -227,15 +233,15 @@ sudo pacman -S jq
 ### install tc
 ```bash
 # option 1: add to PATH
-git clone https://github.com/you/tc
+git clone https://github.com/ahoward/tc
 export PATH="$PWD/tc/bin:$PATH"
 
 # option 2: symlink
-git clone https://github.com/you/tc
+git clone https://github.com/ahoward/tc
 ln -s "$PWD/tc/bin/tc" /usr/local/bin/tc
 
 # option 3: copy to bin
-git clone https://github.com/you/tc
+git clone https://github.com/ahoward/tc
 sudo cp -r tc /opt/tc
 sudo ln -s /opt/tc/bin/tc /usr/local/bin/tc
 ```
