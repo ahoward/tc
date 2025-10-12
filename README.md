@@ -60,6 +60,8 @@ tc is a dead-simple testing framework that lets you:
 tc run <suite-path>         # run single test suite
 tc run <path> --all         # run all suites in directory tree
 tc run <path> --tags TAG    # run suites matching tag
+tc run <path> --parallel    # run all suites in parallel (auto CPU detection)
+tc run <path> --parallel N  # run with N parallel workers
 
 # test generation (new!)
 tc new <test-path>          # generate new test suite
@@ -103,6 +105,7 @@ tc run my-feature  # ✓ pass or ✗ fail
 - [x] result persistence (.tc-result files)
 - [x] hierarchical test discovery (--all flag)
 - [x] tag-based filtering (--tags flag)
+- [x] parallel execution (--parallel flag, auto-detect CPU cores)
 
 **test generation:**
 - [x] scaffold generation (`tc new`)
@@ -121,8 +124,8 @@ tc run my-feature  # ✓ pass or ✗ fail
 - [x] dogfooding (tc tests itself!)
 
 **roadmap:**
-- [ ] parallel execution
 - [ ] pattern-based selection
+- [ ] distributed test execution
 
 ## installation
 
