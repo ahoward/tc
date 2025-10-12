@@ -28,3 +28,8 @@ htmlcov/
 .Trash-*/
 .fseventsd/
 .Spotlight-V100/
+
+# environment files
+.envrc
+.env
+.env.*
