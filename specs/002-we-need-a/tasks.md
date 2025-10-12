@@ -75,12 +75,12 @@
 
 ### Implementation for User Story 2
 
-- [ ] T021 [US2] Implement tc_parse_optional_flags() in lib/core/generator.sh (parse --tags, --priority, --description, --depends)
-- [ ] T022 [US2] Implement tc_format_tags_for_readme() in lib/core/generator.sh (convert comma-separated to backtick-wrapped)
-- [ ] T023 [US2] Implement tc_build_template_variables() in lib/core/generator.sh (assemble all variables with defaults)
-- [ ] T024 [US2] Update tc_generate_readme() in lib/core/generator.sh to use custom DESCRIPTION, TAGS, PRIORITY, DEPENDENCIES variables
-- [ ] T025 [US2] Update "new" command handler in bin/tc to parse and pass optional flags
-- [ ] T026 [US2] Add --help flag to "new" command in bin/tc showing all available options
+- [x] T021 [US2] Implement tc_parse_optional_flags() in lib/core/generator.sh (parse --tags, --priority, --description, --depends)
+- [x] T022 [US2] Implement tc_format_tags_for_readme() in lib/core/generator.sh (convert comma-separated to backtick-wrapped)
+- [x] T023 [US2] Implement tc_build_template_variables() in lib/core/generator.sh (assemble all variables with defaults)
+- [x] T024 [US2] Update tc_generate_readme() in lib/core/generator.sh to use custom DESCRIPTION, TAGS, PRIORITY, DEPENDENCIES variables
+- [x] T025 [US2] Update "new" command handler in bin/tc to parse and pass optional flags
+- [x] T026 [US2] Add --help flag to "new" command in bin/tc showing all available options
 
 **Checkpoint**: `tc new` with flags works, generated tests integrate with `tc list`, `tc explain`, `tc tags`
 

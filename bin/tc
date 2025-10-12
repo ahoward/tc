@@ -298,17 +298,85 @@ tc_init_command() {
     exit $?
 }
 
-# T019: new command - generate test suite
+# T025/T026: new command - generate test suite with optional flags
 tc_new_command() {
-    local test_path="$1"
+    local test_path=""
+
+    # T025: parse optional flags
+    # reset global variables
+    unset TC_GEN_TAGS TC_GEN_PRIORITY TC_GEN_DESCRIPTION TC_GEN_DEPENDS
+
+    # parse arguments
+    while [ $# -gt 0 ]; do
+        case "$1" in
+            --tags)
+                TC_GEN_TAGS="$2"
+                shift 2
+                ;;
+            --priority)
+                TC_GEN_PRIORITY="$2"
+                shift 2
+                ;;
+            --description)
+                TC_GEN_DESCRIPTION="$2"
+                shift 2
+                ;;
+            --depends)
+                TC_GEN_DEPENDS="$2"
+                shift 2
+                ;;
+            --help)
+                # T026: show help for new command
+                cat << 'EOF'
+tc new - generate test suite scaffolding
+
+usage:
+    tc new <test-path> [options]
+
+options:
+    --tags <tag1,tag2>       comma-separated tags (e.g., "auth,api")
+    --priority <level>       priority: high, medium (default), low
+    --description <text>     test description
+    --depends <paths>        space-separated dependency paths
+    --help                   show this help
+
+examples:
+    tc new tests/my-feature
+    tc new tests/auth/login --tags "auth,api" --priority high
+    tc new tests/checkout --description "Test checkout flow" --depends "tests/cart tests/auth"
+
+the generated test will fail until you implement it - that's the point! 🚁
+EOF
+                exit 0
+                ;;
+            -*)
+                tc_error "unknown flag: $1"
+                tc_error "use --help to see available options"
+                exit 1
+                ;;
+            *)
+                if [ -z "$test_path" ]; then
+                    test_path="$1"
+                else
+                    tc_error "unexpected argument: $1"
+                    exit 1
+                fi
+                shift
+                ;;
+        esac
+    done
 
     # validate test path provided
     if [ -z "$test_path" ]; then
-        tc_error "usage: tc new <test-path>"
+        tc_error "usage: tc new <test-path> [options]"
         tc_error ""
         tc_error "example: tc new tests/my-feature"
+        tc_error "use --help for more options"
         exit 1
     fi
+
+    # export flags for use by generator (T021 expects these)
+    export TC_GEN_TAGS TC_GEN_PRIORITY TC_GEN_DESCRIPTION TC_GEN_DEPENDS
 
     # T020: basic error handling
     # parse test path to get test name

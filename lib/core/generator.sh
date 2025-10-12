@@ -138,6 +138,67 @@ tc_set_executable_permission() {
     return 0
 }
 
+# T021: parse optional flags from command line
+tc_parse_optional_flags() {
+    # expects global variables: TC_GEN_TAGS, TC_GEN_PRIORITY, TC_GEN_DESCRIPTION, TC_GEN_DEPENDS
+    # these are set by tc_new_command before calling generation functions
+
+    # set defaults if not provided
+    TC_GEN_TAGS="${TC_GEN_TAGS:-}"
+    TC_GEN_PRIORITY="${TC_GEN_PRIORITY:-medium}"
+    TC_GEN_DESCRIPTION="${TC_GEN_DESCRIPTION:-TODO: describe test purpose}"
+    TC_GEN_DEPENDS="${TC_GEN_DEPENDS:-}"
+}
+
+# T022: format tags for README (comma-separated to backtick-wrapped)
+tc_format_tags_for_readme() {
+    local tags="$1"
+
+    if [ -z "$tags" ]; then
+        echo ""
+        return
+    fi
+
+    # convert "tag1,tag2,tag3" to ", `tag1`, `tag2`, `tag3`"
+    local formatted=""
+    IFS=',' read -ra tag_array <<< "$tags"
+    for tag in "${tag_array[@]}"; do
+        # trim whitespace
+        tag=$(echo "$tag" | xargs)
+        if [ -n "$tag" ]; then
+            formatted="$formatted, \`$tag\`"
+        fi
+    done
+
+    echo "$formatted"
+}
+
+# T023: build template variables with defaults
+tc_build_template_variables() {
+    local test_path="$1"
+
+    # parse path info
+    local path_info=$(tc_parse_test_path "$test_path")
+    local test_name=$(echo "$path_info" | grep '^test_name=' | cut -d= -f2-)
+    local run_when=$(echo "$path_info" | grep '^run_when=' | cut -d= -f2-)
+
+    # parse optional flags (sets defaults if not provided)
+    tc_parse_optional_flags
+
+    # format tags for README
+    local extra_tags=$(tc_format_tags_for_readme "$TC_GEN_TAGS")
+
+    # export variables for use by generation functions
+    export TC_VAR_TEST_NAME="$test_name"
+    export TC_VAR_TEST_PATH="$test_path"
+    export TC_VAR_TIMESTAMP=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+    export TC_VAR_DESCRIPTION="$TC_GEN_DESCRIPTION"
+    export TC_VAR_EXTRA_TAGS="$extra_tags"
+    export TC_VAR_DEPENDENCIES="$TC_GEN_DEPENDS"
+    export TC_VAR_PRIORITY="$TC_GEN_PRIORITY"
+    export TC_VAR_RUN_WHEN="$run_when"
+}
+
 # T013: generate from template (main generation orchestrator)
 tc_generate_from_template() {
     local test_path="$1"
@@ -159,6 +220,9 @@ tc_generate_from_template() {
         tc_error "Template not found: $template_path"
         return 1
     fi
+
+    # build template variables (T023)
+    tc_build_template_variables "$test_path"
 
     # generate all files
     tc_generate_run_script "$test_path" "$template_path" || return 1
@@ -207,17 +271,11 @@ tc_generate_run_script() {
     # read template
     local template_content=$(cat "$run_template")
 
-    # get parsed path info
-    local path_info=$(tc_parse_test_path "$test_path")
-    local test_name=$(echo "$path_info" | grep '^test_name=' | cut -d= -f2-)
-    local run_when=$(echo "$path_info" | grep '^run_when=' | cut -d= -f2-)
-
-    # generate timestamp
-    local timestamp=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
-
-    # substitute variables
-    local output=$(_tc_substitute_variables "$template_content" "$test_name" "$test_path" "$timestamp" \
-        "TODO: describe test purpose" "" "" "medium" "$run_when")
+    # use exported variables from tc_build_template_variables
+    local output=$(_tc_substitute_variables "$template_content" \
+        "$TC_VAR_TEST_NAME" "$TC_VAR_TEST_PATH" "$TC_VAR_TIMESTAMP" \
+        "$TC_VAR_DESCRIPTION" "$TC_VAR_EXTRA_TAGS" "$TC_VAR_DEPENDENCIES" \
+        "$TC_VAR_PRIORITY" "$TC_VAR_RUN_WHEN")
 
     # write run script
     local run_script="$test_path/run"
@@ -230,7 +288,7 @@ tc_generate_run_script() {
     return 0
 }
 
-# T016: generate README with default metadata
+# T016/T024: generate README with custom metadata
 tc_generate_readme() {
     local test_path="$1"
     local template_path="$2"
@@ -244,23 +302,11 @@ tc_generate_readme() {
     # read template
     local template_content=$(cat "$readme_template")
 
-    # get parsed path info
-    local path_info=$(tc_parse_test_path "$test_path")
-    local test_name=$(echo "$path_info" | grep '^test_name=' | cut -d= -f2-)
-    local run_when=$(echo "$path_info" | grep '^run_when=' | cut -d= -f2-)
-
-    # generate timestamp
-    local timestamp=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
-
-    # default metadata (US2 will make these customizable)
-    local description="TODO: describe test purpose"
-    local extra_tags=""  # will be populated by US2
-    local dependencies=""
-    local priority="medium"
-
-    # substitute variables
-    local output=$(_tc_substitute_variables "$template_content" "$test_name" "$test_path" "$timestamp" \
-        "$description" "$extra_tags" "$dependencies" "$priority" "$run_when")
+    # use exported variables from tc_build_template_variables (includes custom metadata)
+    local output=$(_tc_substitute_variables "$template_content" \
+        "$TC_VAR_TEST_NAME" "$TC_VAR_TEST_PATH" "$TC_VAR_TIMESTAMP" \
+        "$TC_VAR_DESCRIPTION" "$TC_VAR_EXTRA_TAGS" "$TC_VAR_DEPENDENCIES" \
+        "$TC_VAR_PRIORITY" "$TC_VAR_RUN_WHEN")
 
     # write README
     local readme="$test_path/README.md"
