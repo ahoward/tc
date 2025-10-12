@@ -154,8 +154,11 @@ if it can read json and write json, tc can test it.
 # run single test suite
 tc run ./tests/auth/login
 
-# run all suites in tree (coming soon)
+# run all suites in directory tree
 tc run ./tests --all
+
+# run all unit tests
+tc run ./tests/unit --all
 
 # parallel execution (coming soon)
 tc run ./tests --all --parallel=4
@@ -271,12 +274,42 @@ theodore calvin (tc) wasn't just a pilot—he was a philosopher of the skies. he
 
 tc the framework embodies this: simple, flexible, portable. no framework lock-in, no complex DSLs, just good old unix principles and json.
 
+## hierarchical test organization
+
+organize tests in directories, run them all at once:
+
+```
+tests/
+├── unit/
+│   ├── json-comparison/
+│   └── validation/
+└── integration/
+    ├── single-suite/
+    └── hierarchical/
+```
+
+```bash
+tc run tests --all               # run everything
+tc run tests/unit --all          # just unit tests
+tc run tests/integration --all   # just integration
+```
+
+results are aggregated:
+```
+====================================
+overall results
+====================================
+
+suites run: 5
+✓ all 12 tests passed
+```
+
 ## examples
 
 check out `examples/` for:
 - `hello-world/` - basic arithmetic (you've seen this)
+- `tests/` - tc tests itself! (dogfooding at its finest)
 - `polyglot/` - same tests, multiple languages (coming soon)
-- `nested/` - hierarchical test organization (coming soon)
 - `parallel/` - fast parallel execution (coming soon)
 
 ## roadmap
@@ -285,11 +318,11 @@ check out `examples/` for:
 - [x] semantic json comparison
 - [x] timeout management
 - [x] result persistence
-- [ ] hierarchical test discovery
+- [x] hierarchical test discovery (--all flag)
+- [x] self-tests (dogfooding - tc tests tc!)
 - [ ] parallel execution
 - [ ] pattern-based selection
 - [ ] fuzzy matching mode
-- [ ] self-tests (dogfooding)
 - [ ] performance benchmarks
 
 ## philosophy (extended)

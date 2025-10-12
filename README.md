@@ -25,6 +25,9 @@ export PATH="$PWD/bin:$PATH"
 
 # run the hello-world example
 tc run examples/hello-world
+
+# run all tests hierarchically
+tc run tests --all
 ```
 
 ## what is tc?
@@ -67,7 +70,8 @@ tc run my-feature  # ✓ pass or ✗ fail
 - [x] semantic json comparison (order-independent)
 - [x] timeout management
 - [x] result persistence (.tc-result files)
-- [ ] hierarchical test discovery
+- [x] hierarchical test discovery (--all flag)
+- [x] dogfooding (tc tests itself!)
 - [ ] parallel execution
 - [ ] pattern-based selection
 
