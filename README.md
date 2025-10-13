@@ -9,11 +9,12 @@ language-agnostic testing for unix hackers
 </p>
 
 ```
-   _____________
-  /     _____    \
- |  TC |_____|    |===    tc v1.0.0 - island hopper
-  \_____________/         testing any language, anywhere
-      |   |               🚁 fly safe, test well
+      o=o=o=o           tc v1.0.0 - island hopper
+         |              testing any language, anywhere
+     ___/ \___          🚁 fly safe, test well
+    [__  TC __]======>
+       \_____/
+        |   |
 ```
 
 ## ⚠️  IMPORTANT: `tc` is a Unix builtin command!
