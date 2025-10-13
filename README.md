@@ -9,12 +9,14 @@ language-agnostic testing for unix hackers
 </p>
 
 ```
-     _____
-    /     \      tc v1.0.0 - island hopper
-   | () () |     testing any language, anywhere
-    \  ^  /
-     |||||
-     |||||
+       ___
+      /___\        tc v1.0.0 - island hopper
+     |  o  |       testing any language, anywhere
+    _|_____|_
+   |_________|     "the chopper's fueled up and ready to go"
+     |     |
+    / \   / \
+   🚁  island hopper
 ```
 
 ## quickstart
@@ -23,7 +25,7 @@ language-agnostic testing for unix hackers
 # clone and install
 git clone https://github.com/ahoward/tc.git
 cd tc
-export PATH="$PWD/tc:$PATH"
+export PATH="$PWD/tc/bin:$PATH"
 
 # generate your first test
 tc new tests/my-feature
@@ -52,6 +54,8 @@ tc is a dead-simple testing framework that lets you:
 - **portable**: runs everywhere bash and jq exist
 - **language-agnostic**: same tests work for bash, python, rust, go, whatever
 - **unix**: text streams, composable, do one thing well
+- **spec-driven**: in the AI age, the dream of language-agnostic development is real - treat your src/ as a build artifact, specs as the source of truth
+- **old-school, new-school**: built with timeless unix tools (tmux, shell, text) for a future where implementation languages are fluid
 
 ## commands
 
@@ -161,8 +165,8 @@ Best for trying out tc or active development.
 ```bash
 git clone https://github.com/ahoward/tc.git
 cd tc
-export PATH="$PWD/tc:$PATH"
-echo 'export PATH="'$PWD'/tc:$PATH"' >> ~/.bashrc  # persist
+export PATH="$PWD/tc/bin:$PATH"
+echo 'export PATH="'$PWD'/tc/bin:$PATH"' >> ~/.bashrc  # persist
 ```
 
 *Pros: Easy to update (git pull), no sudo required, keeps everything in one location*
@@ -175,7 +179,7 @@ Lightweight system-wide installation.
 ```bash
 git clone https://github.com/ahoward/tc.git
 cd tc
-sudo ln -s "$PWD/tc/tc" /usr/local/bin/tc
+sudo ln -s "$PWD/tc/bin/tc" /usr/local/bin/tc
 ```
 
 *Pros: System-wide access, still connected to repo for updates*
@@ -190,7 +194,7 @@ Full system installation, standalone.
 git clone https://github.com/ahoward/tc.git
 cd tc
 sudo cp -r tc /usr/local/
-export PATH="/usr/local/tc:$PATH"
+export PATH="/usr/local/tc/bin:$PATH"
 ```
 
 *Pros: True system install, works even if you delete the clone, no git dependency*
@@ -221,7 +225,7 @@ made with ☕ and helicopters
 
 ## upgrading from pre-1.1 structure
 
-if you have tc installed with the old `bin/tc` structure, follow these steps to upgrade:
+if you have tc installed with the old structure (before v1.1), follow these steps to upgrade:
 
 ### for PATH installations
 
@@ -229,9 +233,10 @@ if you have tc installed with the old `bin/tc` structure, follow these steps to 
 cd /path/to/tc/repo
 git pull
 # update your PATH in ~/.bashrc or ~/.zshrc
-# OLD: export PATH="$PWD/bin:$PATH"
-# NEW: export PATH="$PWD/tc:$PATH"
-export PATH="$PWD/tc:$PATH"
+# OLD (pre-1.0): export PATH="$PWD/bin:$PATH"
+# OLD (v1.0): export PATH="$PWD/tc:$PATH"
+# NEW (v1.1+): export PATH="$PWD/tc/bin:$PATH"
+export PATH="$PWD/tc/bin:$PATH"
 tc --version  # verify
 ```
 
@@ -243,7 +248,7 @@ git pull
 # remove old symlink
 sudo rm /usr/local/bin/tc
 # create new symlink
-sudo ln -s "$PWD/tc/tc" /usr/local/bin/tc
+sudo ln -s "$PWD/tc/bin/tc" /usr/local/bin/tc
 tc --version  # verify
 ```
 
@@ -253,11 +258,11 @@ tc --version  # verify
 cd /path/to/tc/repo
 git pull
 # remove old installation
-sudo rm -rf /usr/local/bin/tc /usr/local/lib/tc
+sudo rm -rf /usr/local/tc /usr/local/lib/tc
 # copy new structure
 sudo cp -r tc /usr/local/
-export PATH="/usr/local/tc:$PATH"
-echo 'export PATH="/usr/local/tc:$PATH"' >> ~/.bashrc  # persist
+export PATH="/usr/local/tc/bin:$PATH"
+echo 'export PATH="/usr/local/tc/bin:$PATH"' >> ~/.bashrc  # persist
 tc --version  # verify
 ```
 

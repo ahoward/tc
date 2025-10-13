@@ -35,7 +35,7 @@ echo '{"value": 5}' > "$suite_dir/data/test1/input.json"
 echo '{"result": 10}' > "$suite_dir/data/test1/expected.json"
 
 # run tc on it
-if "$TC_ROOT/tc" run "$suite_dir" >/dev/null 2>&1; then
+if "$TC_ROOT/bin/tc" run "$suite_dir" >/dev/null 2>&1; then
     actual_status="pass"
 else
     actual_status="fail"

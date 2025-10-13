@@ -9,12 +9,12 @@ TC_VERSION="1.0.0"
 TC_CODENAME="island hopper"
 
 # find tc root directory
-# BASH_SOURCE[0] is the path to this script (tc/tc)
+# BASH_SOURCE[0] is the path to this script (tc/bin/tc)
 # For symlinks, we need to resolve to the actual file location
 # Works for all installation methods:
-#   - Direct: ./tc/tc → TC_ROOT=/path/to/repo/tc
-#   - Symlink: /usr/local/bin/tc → /repo/tc/tc → TC_ROOT=/repo/tc
-#   - Copy: /usr/local/tc/tc → TC_ROOT=/usr/local/tc
+#   - Direct: ./tc/bin/tc → TC_ROOT=/path/to/repo/tc
+#   - Symlink: /usr/local/bin/tc → /repo/tc/bin/tc → TC_ROOT=/repo/tc
+#   - Copy: /usr/local/tc/bin/tc → TC_ROOT=/usr/local/tc
 SCRIPT_PATH="${BASH_SOURCE[0]}"
 # Resolve symlinks
 while [ -L "$SCRIPT_PATH" ]; do
@@ -22,10 +22,12 @@ while [ -L "$SCRIPT_PATH" ]; do
     SCRIPT_PATH="$(readlink "$SCRIPT_PATH")"
     [[ $SCRIPT_PATH != /* ]] && SCRIPT_PATH="$SCRIPT_DIR/$SCRIPT_PATH"
 done
-TC_ROOT="$(cd "$(dirname "$SCRIPT_PATH")" && pwd)"
+# Get directory containing the script (bin/) then go up one level to tc/
+SCRIPT_DIR="$(dirname "$SCRIPT_PATH")"
+TC_ROOT="$(cd "$(dirname "$SCRIPT_DIR")" && pwd)"
 
 # source global configuration
-source "$TC_ROOT/config.sh"
+source "$TC_ROOT/config/defaults.sh"
 
 # source library modules
 source "$TC_ROOT/lib/utils/log.sh"
