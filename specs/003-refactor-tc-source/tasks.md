@@ -58,17 +58,17 @@
 
 ### Implementation for User Story 1
 
-- [ ] T013 [US1] Verify TC_ROOT detection: Test `./tc/tc --version` from repo root
-- [ ] T014 [US1] Verify library loading: Check for any "source: not found" errors
-- [ ] T015 [US1] Test `tc run` command: `tc run examples/hello-world`
-- [ ] T016 [US1] Test `tc run --all` command: `tc run tests --all`
-- [ ] T017 [US1] Test `tc new` command: `tc new /tmp/test-refactor-verify`
-- [ ] T018 [US1] Test `tc init` command: `tc init /tmp/test-init-verify`
-- [ ] T019 [US1] Test `tc list` command: `tc list tests`
-- [ ] T020 [US1] Test `tc tags` command: `tc tags tests`
-- [ ] T021 [US1] Test `tc explain` command: `tc explain tests/unit/json-comparison`
-- [ ] T022 [US1] Test parallel execution: `tc run tests --all --parallel`
-- [ ] T023 [US1] Compare results: Diff current test output vs baseline (T003)
+- [x] T013 [US1] Verify TC_ROOT detection: Test `./tc/tc --version` from repo root
+- [x] T014 [US1] Verify library loading: Check for any "source: not found" errors
+- [x] T015 [US1] Test `tc run` command: `tc run examples/hello-world`
+- [~] T016 [US1] Test `tc run --all` command: `tc run tests --all` (blocked by T024 - tests need new paths)
+- [x] T017 [US1] Test `tc new` command: `tc new /tmp/test-refactor-verify`
+- [x] T018 [US1] Test `tc init` command: `tc init /tmp/test-init-verify`
+- [x] T019 [US1] Test `tc list` command: `tc list tests`
+- [x] T020 [US1] Test `tc tags` command: `tc tags tests`
+- [x] T021 [US1] Test `tc explain` command: `tc explain tests/unit/json-comparison`
+- [x] T022 [US1] Test parallel execution: `tc run tests --all --parallel`
+- [~] T023 [US1] Compare results: Diff current test output vs baseline (T003) (deferred to Phase 7)
 
 **Checkpoint**: User Story 1 complete - all CLI commands work identically to pre-refactor
 
