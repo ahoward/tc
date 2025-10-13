@@ -116,11 +116,11 @@
 
 ### Implementation for User Story 4
 
-- [ ] **T037** [US4] Update `tc_status_init()` in `status-line.sh` to detect non-TTY mode ([ -t 1 ])
-- [ ] **T038** [US4] Update `tc_status_update()` in `status-line.sh` to use plain ASCII in non-TTY mode
-- [ ] **T039** [US4] Update `tc_status_update()` in `status-line.sh` to output new line (not CR) in non-TTY mode
-- [ ] **T040** [US4] Update `tc_ansi_supported()` in `ansi.sh` to return false for non-TTY
-- [ ] **T041** [US4] Ensure NO_COLOR environment variable disables all ANSI codes
+- [X] **T037** [US4] Update `tc_status_init()` in `status-line.sh` to detect non-TTY mode ([ -t 1 ])
+- [X] **T038** [US4] Update `tc_status_update()` in `status-line.sh` to use plain ASCII in non-TTY mode
+- [X] **T039** [US4] Update `tc_status_update()` in `status-line.sh` to output new line (not CR) in non-TTY mode
+- [X] **T040** [US4] Update `tc_ansi_supported()` in `ansi.sh` to return false for non-TTY
+- [X] **T041** [US4] Ensure NO_COLOR environment variable disables all ANSI codes
 
 ### Testing for User Story 4
 
