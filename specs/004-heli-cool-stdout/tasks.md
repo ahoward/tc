@@ -141,16 +141,16 @@
 
 ### Implementation for User Story 3
 
-- [ ] **T046** [US3] Create `tc/lib/utils/log-writer.sh` file structure
-- [ ] **T047** [US3] Implement `tc_log_init()` function in `log-writer.sh` (create .tc-reports/ dir)
-- [ ] **T048** [US3] Implement `tc_log_write(suite_path, test_name, status, duration_ms, error?)` in `log-writer.sh`
-- [ ] **T049** [US3] Implement `tc_log_get_path()` function in `log-writer.sh` (returns log file path)
-- [ ] **T050** [US3] Implement JSON timestamp formatting (ISO 8601) in `log-writer.sh`
-- [ ] **T051** [US3] Implement JSONL append logic in `log-writer.sh` (one JSON object per line)
-- [ ] **T052** [US3] Add log-writer.sh module to tc/bin/tc: `source "$TC_ROOT/lib/utils/log-writer.sh"`
-- [ ] **T053** [US3] Update `tc/lib/core/executor.sh` to call `tc_log_init()` at start
-- [ ] **T054** [US3] Update `tc/lib/core/executor.sh` to call `tc_log_write()` after each test execution
-- [ ] **T055** [US3] Handle optional error parameter in `tc_log_write()` for failed tests
+- [X] **T046** [US3] Create `tc/lib/utils/log-writer.sh` file structure
+- [X] **T047** [US3] Implement `tc_log_init()` function in `log-writer.sh` (create .tc-reports/ dir)
+- [X] **T048** [US3] Implement `tc_log_write(suite_path, test_name, status, duration_ms, error?)` in `log-writer.sh`
+- [X] **T049** [US3] Implement `tc_log_get_path()` function in `log-writer.sh` (returns log file path)
+- [X] **T050** [US3] Implement JSON timestamp formatting (ISO 8601) in `log-writer.sh`
+- [X] **T051** [US3] Implement JSONL append logic in `log-writer.sh` (one JSON object per line)
+- [X] **T052** [US3] Add log-writer.sh module to tc/bin/tc: `source "$TC_ROOT/lib/utils/log-writer.sh"`
+- [X] **T053** [US3] Update `tc/lib/core/executor.sh` to call `tc_log_init()` at start
+- [X] **T054** [US3] Update `tc/lib/core/executor.sh` to call `tc_log_write()` after each test execution
+- [X] **T055** [US3] Handle optional error parameter in `tc_log_write()` for failed tests
 
 ### Testing for User Story 3
 

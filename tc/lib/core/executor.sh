@@ -20,6 +20,9 @@ tc_execute_suite() {
     # initialize status line (T018)
     tc_status_init
 
+    # initialize logging system (T053)
+    tc_log_init
+
     # load suite-specific configuration if present
     if [ -f "$suite_dir/config.sh" ]; then
         tc_debug "loading suite config: $suite_dir/config.sh"
@@ -72,6 +75,8 @@ tc_execute_suite() {
             results+=("$scenario_name|error|0|validation failed")
             # Update status line after failure
             tc_status_update "$suite_name" "$scenario_name" "failed" "$passed" "$((failed + errors))"
+            # Write to log (T054, T055)
+            tc_log_write "$suite_dir" "$scenario_name" "error" "0" "validation failed"
             continue
         fi
 
@@ -83,6 +88,8 @@ tc_execute_suite() {
             results+=("$scenario_name|error|0|runner failed")
             # Update status line after failure
             tc_status_update "$suite_name" "$scenario_name" "failed" "$passed" "$((failed + errors))"
+            # Write to log (T054, T055)
+            tc_log_write "$suite_dir" "$scenario_name" "error" "0" "runner failed"
             continue
         fi
 
@@ -98,6 +105,8 @@ tc_execute_suite() {
             tc_cleanup_runner_output "$output_file" "$stderr_file"
             # Update status line after failure
             tc_status_update "$suite_name" "$scenario_name" "failed" "$passed" "$((failed + errors))"
+            # Write to log (T054, T055)
+            tc_log_write "$suite_dir" "$scenario_name" "error" "$duration" "timeout after ${timeout}s"
             continue
         elif [ "$exit_code" -ne 0 ]; then
             tc_progress_fail
@@ -107,6 +116,8 @@ tc_execute_suite() {
             tc_cleanup_runner_output "$output_file" "$stderr_file"
             # Update status line after failure
             tc_status_update "$suite_name" "$scenario_name" "failed" "$passed" "$((failed + errors))"
+            # Write to log (T054, T055)
+            tc_log_write "$suite_dir" "$scenario_name" "error" "$duration" "exit code $exit_code"
             continue
         fi
 
@@ -123,6 +134,8 @@ tc_execute_suite() {
             results+=("$scenario_name|pass|$duration|")
             # Update status line after pass (T019)
             tc_status_update "$suite_name" "$scenario_name" "passed" "$passed" "$failed"
+            # Write to log (T054)
+            tc_log_write "$suite_dir" "$scenario_name" "pass" "$duration"
         else
             tc_progress_fail
             ((failed++))
@@ -130,6 +143,8 @@ tc_execute_suite() {
             results+=("$scenario_name|fail|$duration|$diff")
             # Update status line after failure (T019)
             tc_status_update "$suite_name" "$scenario_name" "failed" "$passed" "$failed"
+            # Write to log with error (T054, T055)
+            tc_log_write "$suite_dir" "$scenario_name" "fail" "$duration" "$diff"
         fi
 
         # cleanup
