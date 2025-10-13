@@ -10,12 +10,19 @@ TC_CODENAME="island hopper"
 
 # find tc root directory
 # BASH_SOURCE[0] is the path to this script (tc/tc)
-# dirname gives us the directory containing it (tc/)
-# We resolve to absolute path - works for all installation methods:
+# For symlinks, we need to resolve to the actual file location
+# Works for all installation methods:
 #   - Direct: ./tc/tc → TC_ROOT=/path/to/repo/tc
 #   - Symlink: /usr/local/bin/tc → /repo/tc/tc → TC_ROOT=/repo/tc
 #   - Copy: /usr/local/tc/tc → TC_ROOT=/usr/local/tc
-TC_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+SCRIPT_PATH="${BASH_SOURCE[0]}"
+# Resolve symlinks
+while [ -L "$SCRIPT_PATH" ]; do
+    SCRIPT_DIR="$(cd -P "$(dirname "$SCRIPT_PATH")" && pwd)"
+    SCRIPT_PATH="$(readlink "$SCRIPT_PATH")"
+    [[ $SCRIPT_PATH != /* ]] && SCRIPT_PATH="$SCRIPT_DIR/$SCRIPT_PATH"
+done
+TC_ROOT="$(cd "$(dirname "$SCRIPT_PATH")" && pwd)"
 
 # source global configuration
 source "$TC_ROOT/config.sh"

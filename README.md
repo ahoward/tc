@@ -218,3 +218,46 @@ made with ☕ and helicopters
 *"the chopper's fueled up and ready to go. let's test some code."* — tc
 
 🚁 **fly safe, test well**
+
+## upgrading from pre-1.1 structure
+
+if you have tc installed with the old `bin/tc` structure, follow these steps to upgrade:
+
+### for PATH installations
+
+```bash
+cd /path/to/tc/repo
+git pull
+# update your PATH in ~/.bashrc or ~/.zshrc
+# OLD: export PATH="$PWD/bin:$PATH"
+# NEW: export PATH="$PWD/tc:$PATH"
+export PATH="$PWD/tc:$PATH"
+tc --version  # verify
+```
+
+### for symlink installations
+
+```bash
+cd /path/to/tc/repo
+git pull
+# remove old symlink
+sudo rm /usr/local/bin/tc
+# create new symlink
+sudo ln -s "$PWD/tc/tc" /usr/local/bin/tc
+tc --version  # verify
+```
+
+### for copy installations
+
+```bash
+cd /path/to/tc/repo
+git pull
+# remove old installation
+sudo rm -rf /usr/local/bin/tc /usr/local/lib/tc
+# copy new structure
+sudo cp -r tc /usr/local/
+export PATH="/usr/local/tc:$PATH"
+echo 'export PATH="/usr/local/tc:$PATH"' >> ~/.bashrc  # persist
+tc --version  # verify
+```
+

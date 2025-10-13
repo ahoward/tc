@@ -121,12 +121,12 @@
 
 **Purpose**: Validate all installation methods work with new structure
 
-- [ ] T041 [P] Test PATH installation: `export PATH="$PWD/tc:$PATH" && tc --version`
-- [ ] T042 [P] Test symlink installation: Create symlink to `/tmp/tc-test`, verify works
-- [ ] T043 [P] Test copy installation: Copy `tc/` to `/tmp/tc-install`, verify works
-- [ ] T044 Verify TC_ROOT resolution for each installation method
-- [ ] T045 Create migration guide for existing installations (append to README.md)
-- [ ] T046 Add troubleshooting section to quickstart.md (already exists)
+- [x] T041 [P] Test PATH installation: `export PATH="$PWD/tc:$PATH" && tc --version`
+- [x] T042 [P] Test symlink installation: Create symlink to `/tmp/tc-test`, verify works
+- [x] T043 [P] Test copy installation: Copy `tc/` to `/tmp/tc-install`, verify works
+- [x] T044 Verify TC_ROOT resolution for each installation method
+- [x] T045 Create migration guide for existing installations (append to README.md)
+- [x] T046 Add troubleshooting section to quickstart.md (already exists)
 
 **Checkpoint**: All installation methods validated
 
