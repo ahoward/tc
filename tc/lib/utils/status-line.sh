@@ -18,6 +18,27 @@ TC_ANIMATION_FRAME=0
 TC_STATUS_LABEL="RUNNING"
 TC_TERMINAL_WIDTH=80
 
+# Animation frames (T029)
+TC_SPINNER_FRAMES=('⠋' '⠙' '⠹' '⠸' '⠼' '⠴' '⠦' '⠧' '⠇' '⠏')
+
+# tc_next_spinner()
+#
+# Get next spinner frame and advance animation counter (T030).
+#
+# Returns:
+#   Outputs spinner character to stdout
+#   Exit code 0
+tc_next_spinner() {
+    local frame_count=${#TC_SPINNER_FRAMES[@]}
+    local current_frame="${TC_SPINNER_FRAMES[$TC_ANIMATION_FRAME]}"
+
+    # Advance frame counter
+    TC_ANIMATION_FRAME=$(( (TC_ANIMATION_FRAME + 1) % frame_count ))
+
+    echo "$current_frame"
+    return 0
+}
+
 # tc_terminal_width()
 #
 # Get current terminal width in columns.
@@ -122,8 +143,50 @@ tc_status_update() {
             ;;
     esac
 
-    # Format status line
-    local status_line="RUNNING : ${suite}/${test}"
+    # Format status line with emoji and colors (T026-T028)
+    local emoji="🚁"
+    local status_label="$TC_STATUS_LABEL"
+
+    # Apply colors if ANSI supported
+    if tc_ansi_supported; then
+        case "$TC_STATUS_LABEL" in
+            RUNNING)
+                status_label="$(tc_ansi_color yellow)${TC_STATUS_LABEL}$(tc_ansi_color reset)"
+                ;;
+            PASSED)
+                status_label="$(tc_ansi_color green)${TC_STATUS_LABEL}$(tc_ansi_color reset)"
+                ;;
+            FAILED)
+                status_label="$(tc_ansi_color red)${TC_STATUS_LABEL}$(tc_ansi_color reset)"
+                ;;
+        esac
+    fi
+
+    # Get animation (T031)
+    local animation=""
+    if [ "$TC_STATUS_LABEL" = "RUNNING" ] && [ "$TC_NO_ANIMATION" != "1" ]; then
+        animation=" $(tc_next_spinner)"
+    fi
+
+    # Format: emoji : COLOR_LABEL : suite/test : animation
+    local status_line="${emoji} : ${status_label} : ${suite}/${test}${animation}"
+
+    # T032: Truncate if status line too long for terminal
+    local max_width=$(tc_terminal_width)
+    # Account for ANSI codes (they don't take visual space but add characters)
+    # Simple heuristic: if line looks too long, truncate suite/test part
+    if [ ${#status_line} -gt $((max_width + 20)) ]; then
+        # Truncate suite/test with ellipsis
+        local available=$(( max_width - 30 ))  # Reserve space for prefix and animation
+        if [ $available -lt 10 ]; then
+            available=10
+        fi
+        local truncated_path="${suite}/${test}"
+        if [ ${#truncated_path} -gt $available ]; then
+            truncated_path="${truncated_path:0:$((available-3))}..."
+        fi
+        status_line="${emoji} : ${status_label} : ${truncated_path}${animation}"
+    fi
 
     # Output based on mode (send to stderr to not interfere with result data)
     if [ "$TC_STATUS_MODE" = "tty" ]; then

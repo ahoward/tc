@@ -89,13 +89,13 @@
 
 ### Implementation for User Story 2
 
-- [ ] **T026** [US2] Update `tc_status_update()` in `status-line.sh` to add emoji prefix (🚁)
-- [ ] **T027** [US2] Update `tc_status_update()` in `status-line.sh` to add colored status labels (use tc_ansi_color)
-- [ ] **T028** [US2] Update `tc_status_update()` in `status-line.sh` to format as: `emoji : COLOR_LABEL : info : animation`
-- [ ] **T029** [US2] Implement animation state in `status-line.sh` (frame counter, spinner array)
-- [ ] **T030** [US2] Implement `tc_animate_dots()` or `tc_next_spinner()` function in `status-line.sh`
-- [ ] **T031** [US2] Update `tc_status_update()` to append animation to rightmost portion of line
-- [ ] **T032** [US2] Implement terminal width handling in `tc_status_update()` (truncate long suite names with ...)
+- [X] **T026** [US2] Update `tc_status_update()` in `status-line.sh` to add emoji prefix (🚁)
+- [X] **T027** [US2] Update `tc_status_update()` in `status-line.sh` to add colored status labels (use tc_ansi_color)
+- [X] **T028** [US2] Update `tc_status_update()` in `status-line.sh` to format as: `emoji : COLOR_LABEL : info : animation`
+- [X] **T029** [US2] Implement animation state in `status-line.sh` (frame counter, spinner array)
+- [X] **T030** [US2] Implement `tc_animate_dots()` or `tc_next_spinner()` function in `status-line.sh`
+- [X] **T031** [US2] Update `tc_status_update()` to append animation to rightmost portion of line
+- [X] **T032** [US2] Implement terminal width handling in `tc_status_update()` (truncate long suite names with ...)
 
 ### Testing for User Story 2
 
