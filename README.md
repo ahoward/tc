@@ -11,9 +11,9 @@ language-agnostic testing for unix hackers
 ```
     o=o=o=o=o=o=o=o           tc v1.0.0 - island hopper
            |                  testing any language, anywhere
-       ___/ \___              🚁 fly safe, test well
-      (    TC   )======((--o--))
-         \_____/
+       ___/ \___                 |
+      (    TC   )======[o]       🚁 fly safe, test well
+         \_____/               |
           |   |
 ```
 
