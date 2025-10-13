@@ -105,13 +105,13 @@
 
 ### Implementation for User Story 3
 
-- [ ] T034 [US3] Add suite config loading to `tc/lib/core/executor.sh`: Detect and source `$suite_dir/config.sh`
-- [ ] T035 [US3] Update config loading to respect environment variables: Use `${VAR:=default}` syntax
-- [ ] T036 [US3] Create example suite with custom config: `examples/custom-config/config.sh`
-- [ ] T037 [US3] Test configuration precedence: Verify env > suite > global order
-- [ ] T038 [US3] Test configuration isolation: Verify suite configs don't leak between tests
-- [ ] T039 [US3] Document configuration hierarchy in `quickstart.md` (already created in planning)
-- [ ] T040 [US3] Add config override examples to documentation
+- [x] T034 [US3] Add suite config loading to `tc/lib/core/executor.sh`: Detect and source `$suite_dir/config.sh`
+- [x] T035 [US3] Update config loading to respect environment variables: Use `${VAR:=default}` syntax
+- [x] T036 [US3] Create example suite with custom config: `examples/custom-config/config.sh`
+- [x] T037 [US3] Test configuration precedence: Verify env > suite > global order
+- [x] T038 [US3] Test configuration isolation: Verify suite configs don't leak between tests
+- [x] T039 [US3] Document configuration hierarchy in `quickstart.md` (already created in planning)
+- [x] T040 [US3] Add config override examples to documentation
 
 **Checkpoint**: User Story 3 complete - per-suite configuration working
 

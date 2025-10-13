@@ -17,6 +17,12 @@ tc_execute_suite() {
 
     tc_info "executing suite: $suite_dir"
 
+    # load suite-specific configuration if present
+    if [ -f "$suite_dir/config.sh" ]; then
+        tc_debug "loading suite config: $suite_dir/config.sh"
+        source "$suite_dir/config.sh"
+    fi
+
     # validate suite structure
     local validation_errors=$(tc_validate_suite "$suite_dir")
     if [ $? -ne 0 ]; then
