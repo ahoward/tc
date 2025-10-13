@@ -10,10 +10,17 @@ TODO
 Error: Process completed with exit code 1.
 - ensure streaming inputs is compatible with logs fmt/jsonl
 
+- tc init should `cd ./bin/ && ln -s ../tc/bin/tc ./` iff ./bin/ is present.  aka.  'tc init installs a symlink binstub`.  alternatively, it would write a one line binstub bash script.  most devs have ./bin/ in thier path.
+
 > i want to compact things.  ***K.I.S.S***.  1. 'tc run' should be the default mode, therefore, one can type `./tc/bin/tc`, or, if in $PATH, simply `tc`, to run all tests.
+
+./tc/bin/tc tc/tests --all
 
 DOIN
 ====
+
+> next, i want to add the following logic to the $path argument (argv[0]) to run.  1. paths are either relative to ./tc/tests, or absolute.  absolute paths start with '.' or '/'.  2. when no tests are specified, or the specic alias @all,
+all tests will be run.  later, we will support groups of tests, such as 'tc @auth' or 'tc @feature' to run a configured sub-set of tests
 
 1. heli-cool $stdout : single status line with animating helicopters and shit for test runners
 

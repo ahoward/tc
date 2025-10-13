@@ -22,9 +22,9 @@ while [ -L "$SCRIPT_PATH" ]; do
     SCRIPT_PATH="$(readlink "$SCRIPT_PATH")"
     [[ $SCRIPT_PATH != /* ]] && SCRIPT_PATH="$SCRIPT_DIR/$SCRIPT_PATH"
 done
-# Get directory containing the script (bin/) then go up one level to tc/
-SCRIPT_DIR="$(dirname "$SCRIPT_PATH")"
-TC_ROOT="$(cd "$(dirname "$SCRIPT_DIR")" && pwd)"
+# Get absolute path to the script, then get directory containing the script (bin/), then go up one level to tc/
+SCRIPT_DIR="$(cd -P "$(dirname "$SCRIPT_PATH")" && pwd)"
+TC_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 
 # source global configuration
 source "$TC_ROOT/config/defaults.sh"
@@ -99,23 +99,23 @@ tc_run_command() {
     local parallel_jobs=""
 
     # Smart path resolution (KISS)
-    # 1. @all or empty → run all tests in ./tests
+    # 1. @all or empty → run all tests in $TC_ROOT/tests
     # 2. @group → future: run tagged group (e.g., @auth)
     # 3. Paths starting with . or / → absolute, use as-is
-    # 4. Other paths → relative to ./tests
+    # 4. Other paths → relative to $TC_ROOT/tests
     if [ "$suite_path" = "@all" ] || [ -z "$suite_path" ]; then
-        suite_path="tests"
+        suite_path="$TC_ROOT/tests"
         run_all=true
     elif [[ "$suite_path" =~ ^@ ]]; then
         # Future: @group support (e.g., @auth, @integration)
         local group_name="${suite_path#@}"
         tc_info "running test group: @$group_name"
-        suite_path="tests"
+        suite_path="$TC_ROOT/tests"
         filter_tags="$group_name"
         run_all=true
     elif [[ ! "$suite_path" =~ ^[./] ]]; then
-        # Relative path - resolve to tests/
-        suite_path="tests/$suite_path"
+        # Relative path - resolve to $TC_ROOT/tests/
+        suite_path="$TC_ROOT/tests/$suite_path"
     fi
     # else: absolute path (starts with . or /) - use as-is
 
