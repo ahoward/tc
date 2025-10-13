@@ -8,6 +8,8 @@ Auto-generated from all feature plans. Last updated: 2025-10-11
 - File system (generated templates and directories) (002-we-need-a)
 - Bash 4.0+ (POSIX-compatible shell scripting) + jq (JSON processing), standard POSIX tools (sh, basename, dirname, find, grep, etc.) (003-refactor-tc-source)
 - Filesystem-based (test suites as directories, results as .tc-result JSONL files) (003-refactor-tc-source)
+- Bash 4.0+ (POSIX-compatible shell scripting) + Existing TC framework, jq (already required), standard POSIX tools (test, printf, tput) (004-heli-cool-stdout)
+- JSONL files (`.tc-reports/report.jsonl`) (004-heli-cool-stdout)
 
 ## Project Structure
 ```
@@ -22,9 +24,9 @@ tests/
 Shell script (POSIX-compatible) for core framework, any language for test runners: Follow standard conventions
 
 ## Recent Changes
+- 004-heli-cool-stdout: Added Bash 4.0+ (POSIX-compatible shell scripting) + Existing TC framework, jq (already required), standard POSIX tools (test, printf, tput)
 - 003-refactor-tc-source: Added Bash 4.0+ (POSIX-compatible shell scripting) + jq (JSON processing), standard POSIX tools (sh, basename, dirname, find, grep, etc.)
 - 002-we-need-a: Added Bash 4.0+ (POSIX-compatible shell scripting) + jq (JSON processing), existing tc framework
-- 001-design-a-testing: Added Shell script (POSIX-compatible) for core framework, any language for test runners + None (zero external dependencies beyond standard POSIX tools: sh, jq for JSON handling, basic coreutils)
 
 <!-- MANUAL ADDITIONS START -->
 <!-- MANUAL ADDITIONS END -->
