@@ -22,9 +22,9 @@
 
 **Purpose**: Project initialization and prepare for refactoring
 
-- [ ] T001 Create new directory structure: `mkdir -p tc/lib/{core,utils} tc/tests/{unit,integration}`
-- [ ] T002 [P] Backup current structure: Create git commit with message "pre-refactor checkpoint"
-- [ ] T003 [P] Run baseline tests: `tc run tests --all` to capture pre-refactor results
+- [x] T001 Create new directory structure: `mkdir -p tc/lib/{core,utils} tc/tests/{unit,integration}`
+- [x] T002 [P] Backup current structure: Create git commit with message "pre-refactor checkpoint"
+- [x] T003 [P] Run baseline tests: `tc run tests --all` to capture pre-refactor results
 
 **Checkpoint**: Baseline established, safe to proceed with refactoring
 
@@ -36,15 +36,15 @@
 
 **⚠️ CRITICAL**: No user story work can begin until this phase is complete
 
-- [ ] T004 Move CLI entry point: `git mv bin/tc tc/tc`
-- [ ] T005 Update TC_ROOT calculation in `tc/tc` (line ~12): Remove `/../` from path resolution
-- [ ] T006 Move global config: `git mv lib/config/defaults.sh tc/config.sh`
-- [ ] T007 Update config source path in `tc/tc` (line ~15): `source "$TC_ROOT/config.sh"`
-- [ ] T008 [P] Move core libraries: `git mv lib/core/*.sh tc/lib/core/`
-- [ ] T009 [P] Move utility libraries: `git mv lib/utils/*.sh tc/lib/utils/`
-- [ ] T010 Update all library source paths in `tc/tc` (lines 16-23): Change `lib/` → `tc/lib/`
-- [ ] T011 Make `tc/tc` executable: `chmod +x tc/tc`
-- [ ] T012 Remove old directories: `git rm -r bin/ lib/`
+- [x] T004 Move CLI entry point: `git mv bin/tc tc/tc`
+- [x] T005 Update TC_ROOT calculation in `tc/tc` (line ~12): Remove `/../` from path resolution
+- [x] T006 Move global config: `git mv lib/config/defaults.sh tc/config.sh`
+- [x] T007 Update config source path in `tc/tc` (line ~15): `source "$TC_ROOT/config.sh"`
+- [x] T008 [P] Move core libraries: `git mv lib/core/*.sh tc/lib/core/`
+- [x] T009 [P] Move utility libraries: `git mv lib/utils/*.sh tc/lib/utils/`
+- [x] T010 Update all library source paths in `tc/tc` (lines 16-23): Change `lib/` → `tc/lib/`
+- [x] T011 Make `tc/tc` executable: `chmod +x tc/tc`
+- [x] T012 Remove old directories: `git rm -r bin/ lib/`
 
 **Checkpoint**: Foundation ready - basic CLI functionality restored with new paths
 

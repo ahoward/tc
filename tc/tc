@@ -9,10 +9,12 @@ TC_VERSION="1.0.0"
 TC_CODENAME="island hopper"
 
 # find tc root directory
-TC_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+TC_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
-# source core libraries
-source "$TC_ROOT/lib/config/defaults.sh"
+# source global configuration
+source "$TC_ROOT/config.sh"
+
+# source library modules
 source "$TC_ROOT/lib/utils/log.sh"
 source "$TC_ROOT/lib/utils/json.sh"
 source "$TC_ROOT/lib/core/discovery.sh"
