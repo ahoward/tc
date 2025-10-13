@@ -56,30 +56,36 @@ show_help() {
 tc - theodore calvin's testing framework 🚁
 
 usage:
-    tc run <suite-path>         run a single test suite
-    tc run <path> --all         run all suites in directory tree
-    tc run <path> --tags TAG    run suites matching tag
-    tc run <path> --parallel    run all suites in parallel (auto-detect cores)
-    tc run <path> --parallel N  run all suites with N parallel workers
-    tc init [directory]         initialize test directory with README
+    tc [path]                   run tests (defaults to all)
+    tc @all                     run all tests (explicit)
+    tc @group                   run tagged test group (future)
+    tc <path> --all             run all suites in directory tree
+    tc <path> --parallel        run all suites in parallel
+    tc init [directory]         initialize test directory
     tc new <test-path>          generate a new test suite
-    tc list [path]              list all test suites with metadata
+    tc list [path]              list all test suites
     tc tags [path]              show all available tags
     tc explain <suite>          explain what a test suite does
     tc --version                show version info
     tc --help                   show this help
 
+path resolution:
+    tc                          # runs all tests in ./tests
+    tc @all                     # same as above
+    tc unit/my-test             # relative to ./tests → ./tests/unit/my-test
+    tc ./tests/unit/my-test     # absolute path (starts with . or /)
+    tc /abs/path/to/tests       # absolute path
+
 examples:
-    tc run ./tests/auth/login          # run one suite
-    tc run ./tests --all               # run all suites
-    tc run tests --tags auth           # run all auth tests
-    tc run tests --all --parallel      # run all suites in parallel
-    tc run tests --all --parallel=4    # run with 4 workers
-    tc init tests                      # initialize tests/ directory
-    tc new tests/my-feature            # generate new test suite
-    tc list tests                      # list all tests in tests/
-    tc tags                            # show all tags
-    tc explain tests/unit/json         # explain test suite
+    tc                                 # run all tests (KISS!)
+    tc @all                            # explicit: run all tests
+    tc unit/json-comparison            # run single suite (relative)
+    tc ./tests/unit/json-comparison    # run single suite (absolute)
+    tc @all --parallel                 # run all tests in parallel
+    tc @auth                           # future: run @auth tagged tests
+    tc new unit/my-feature             # generate new test
+    tc list                            # list all tests
+    tc explain unit/json-comparison    # explain a test
 
 made with ☕ and helicopters
 EOF
@@ -87,10 +93,31 @@ EOF
 
 # run command - execute test suite(s)
 tc_run_command() {
-    local suite_path="${1:-.}"
+    local suite_path="${1:-@all}"
     local run_all=false
     local filter_tags=""
     local parallel_jobs=""
+
+    # Smart path resolution (KISS)
+    # 1. @all or empty → run all tests in ./tests
+    # 2. @group → future: run tagged group (e.g., @auth)
+    # 3. Paths starting with . or / → absolute, use as-is
+    # 4. Other paths → relative to ./tests
+    if [ "$suite_path" = "@all" ] || [ -z "$suite_path" ]; then
+        suite_path="tests"
+        run_all=true
+    elif [[ "$suite_path" =~ ^@ ]]; then
+        # Future: @group support (e.g., @auth, @integration)
+        local group_name="${suite_path#@}"
+        tc_info "running test group: @$group_name"
+        suite_path="tests"
+        filter_tags="$group_name"
+        run_all=true
+    elif [[ ! "$suite_path" =~ ^[./] ]]; then
+        # Relative path - resolve to tests/
+        suite_path="tests/$suite_path"
+    fi
+    # else: absolute path (starts with . or /) - use as-is
 
     # parse flags
     shift
