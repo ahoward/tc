@@ -48,6 +48,22 @@ tc is a dead-simple testing framework that lets you:
 - run tests with zero dependencies (just jq)
 - port code between languages without rewriting tests
 
+### quine-like behavior
+
+tc has a unique self-referential property: it knows the difference between running its own tests and running your tests.
+
+**in the TC development repo:**
+- `tc run examples --all` → runs example tests only
+- `tc run tc/tests --all` → runs TC's framework self-tests
+- `tc list .` → shows examples (not tc/tests)
+
+**when installed in your project:**
+- `tc run tests --all` → runs your project's tests
+- tc's self-tests (`tc/tests/`) are included in the installation but invisible to discovery
+- the same binary behaves contextually based on what it finds
+
+this means you can vendor TC into your project, and it naturally adapts to run your tests instead of its own.
+
 ## philosophy
 
 - **simple**: if you can write a shell script, you can write tests
