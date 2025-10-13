@@ -524,8 +524,9 @@ main() {
             tc_explain_command "$@"
             ;;
         *)
-            show_help
-            exit 1
+            # Default to 'run' command - KISS!
+            # If no command given or first arg looks like a path/flag, run tests
+            tc_run_command "$@"
             ;;
     esac
 }

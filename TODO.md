@@ -10,6 +10,8 @@ TODO
 Error: Process completed with exit code 1.
 - ensure streaming inputs is compatible with logs fmt/jsonl
 
+> i want to compact things.  ***K.I.S.S***.  1. 'tc run' should be the default mode, therefore, one can type `./tc/bin/tc`, or, if in $PATH, simply `tc`, to run all tests.
+
 DOIN
 ====
 
