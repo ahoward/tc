@@ -1,0 +1,5 @@
+{
+  "test_type": "exact_match",
+  "json1": "{\"x\": 42, \"y\": \"hello\"}",
+  "json2": "{\"x\": 42, \"y\": \"hello\"}"
+}

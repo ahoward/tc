@@ -1,0 +1,5 @@
+{
+  "test_type": "order_independent",
+  "json1": "{\"a\": 1, \"b\": 2}",
+  "json2": "{\"b\": 2, \"a\": 1}"
+}

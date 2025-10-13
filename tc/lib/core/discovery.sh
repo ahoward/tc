@@ -24,6 +24,12 @@ tc_discover_suites() {
     done
 }
 
+# check if we're in the TC development repo
+tc_is_tc_repo() {
+    # We're in TC repo if tc/bin/tc exists and TC_ROOT points to tc/
+    [ -f "$TC_ROOT/bin/tc" ] && [ "$TC_ROOT" = "$(cd "$TC_ROOT" && pwd)" ]
+}
+
 # find all test suites recursively
 tc_discover_suites_recursive() {
     local search_path="${1:-.}"
@@ -33,6 +39,22 @@ tc_discover_suites_recursive() {
 
     find "$search_path" -type f -name "run" -executable 2>/dev/null | while read -r runner; do
         local suite_dir=$(dirname "$runner")
+
+        # Quine-like behavior: exclude TC's self-tests when searching user directories
+        # If we're in TC repo and searching a path that's NOT explicitly tc/tests,
+        # then skip any suites that are under TC_ROOT/tests
+        if tc_is_tc_repo; then
+            # Get absolute paths for comparison
+            local abs_suite_dir="$(cd "$suite_dir" && pwd)"
+            local abs_search_path="$(cd "$search_path" && pwd)"
+            local tc_tests_path="$TC_ROOT/tests"
+
+            # If search path is not under tc/tests but suite is, skip it
+            if [[ "$abs_search_path" != "$tc_tests_path"* ]] && [[ "$abs_suite_dir" == "$tc_tests_path"* ]]; then
+                tc_debug "skipping TC self-test: $suite_dir (quine-like behavior)"
+                continue
+            fi
+        fi
 
         # apply pattern filter if specified
         if [ -n "$pattern" ]; then

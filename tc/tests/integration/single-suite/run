@@ -1,0 +1,51 @@
+#!/usr/bin/env bash
+# integration test: run tc on a simple test suite
+# this tests that tc can execute a complete test suite end-to-end
+
+set -e
+
+input_file="$1"
+
+# source tc root
+TC_ROOT="$(cd "$(dirname "$0")/../../.." && pwd)"
+
+# parse input
+suite_name=$(jq -r '.suite_name' "$input_file")
+expected_status=$(jq -r '.expected_status' "$input_file")
+
+# create a temporary test suite
+tmpdir=$(mktemp -d)
+trap "rm -rf $tmpdir" EXIT
+
+suite_dir="$tmpdir/$suite_name"
+mkdir -p "$suite_dir/data/test1"
+
+# create runner
+cat > "$suite_dir/run" << 'RUNNER_EOF'
+#!/usr/bin/env bash
+input_file="$1"
+value=$(jq -r '.value' "$input_file")
+result=$((value * 2))
+jq -n --argjson result "$result" '{result: $result}'
+RUNNER_EOF
+chmod +x "$suite_dir/run"
+
+# create test data
+echo '{"value": 5}' > "$suite_dir/data/test1/input.json"
+echo '{"result": 10}' > "$suite_dir/data/test1/expected.json"
+
+# run tc on it
+if "$TC_ROOT/bin/tc" run "$suite_dir" >/dev/null 2>&1; then
+    actual_status="pass"
+else
+    actual_status="fail"
+fi
+
+# check result
+if [ "$actual_status" = "$expected_status" ]; then
+    result="pass"
+else
+    result="fail"
+fi
+
+jq -n --arg result "$result" --arg actual "$actual_status" '{result: $result, actual_status: $actual}'

@@ -1,0 +1,5 @@
+{
+  "test_type": "different_values",
+  "json1": "{\"value\": 10}",
+  "json2": "{\"value\": 20}"
+}

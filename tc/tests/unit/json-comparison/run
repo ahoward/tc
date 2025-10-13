@@ -1,0 +1,37 @@
+#!/usr/bin/env bash
+# test tc's json comparison functionality
+# tests the semantic json comparator directly
+
+set -e
+
+input_file="$1"
+
+# source tc libraries
+TC_ROOT="$(cd "$(dirname "$0")/../../.." && pwd)"
+source "$TC_ROOT/lib/utils/log.sh"
+source "$TC_ROOT/lib/utils/json.sh"
+source "$TC_ROOT/lib/core/comparator.sh"
+
+# parse input
+test_type=$(jq -r '.test_type' "$input_file")
+json1=$(jq -r '.json1' "$input_file")
+json2=$(jq -r '.json2' "$input_file")
+
+# create temp files
+tmp1=$(mktemp)
+tmp2=$(mktemp)
+echo "$json1" > "$tmp1"
+echo "$json2" > "$tmp2"
+
+# run comparison
+if tc_compare_semantic_json "$tmp1" "$tmp2" 2>/dev/null; then
+    result="match"
+else
+    result="mismatch"
+fi
+
+# cleanup
+rm -f "$tmp1" "$tmp2"
+
+# output result
+jq -n --arg result "$result" '{result: $result}'

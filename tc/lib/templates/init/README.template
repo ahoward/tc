@@ -1,0 +1,309 @@
+# Test Suite Directory
+
+**Created**: ${TIMESTAMP}
+**Testing Framework**: tc (theodore calvin) 🚁
+
+## Overview
+
+This directory contains test suites for the project. Each test suite is a self-contained directory with a `run` script, test data, and metadata.
+
+## Quick Start
+
+### Creating a New Test
+
+```bash
+# Generate a new test suite
+tc new tests/my-feature
+
+# Edit the generated files
+# - tests/my-feature/run - implement test logic
+# - tests/my-feature/data/*/input.json - test inputs
+# - tests/my-feature/data/*/expected.json - expected outputs
+
+# Run your test
+tc run tests/my-feature
+```
+
+### Running Tests
+
+```bash
+# Run a single test suite
+tc run tests/my-feature
+
+# Run all tests in this directory
+tc run tests --all
+
+# Run tests by tag
+tc run tests --tags auth
+
+# List all tests
+tc list tests
+
+# Explain a test
+tc explain tests/my-feature
+```
+
+## Test Suite Structure
+
+Each test suite follows this structure:
+
+```
+tests/feature-name/
+├── run                 # Executable test runner (any language)
+├── README.md           # Test metadata and documentation
+└── data/               # Test scenarios
+    └── scenario-name/
+        ├── input.json      # Input data
+        └── expected.json   # Expected output
+```
+
+### The `run` Script
+
+- **Input**: Receives path to `input.json` as first argument (`$1`)
+- **Output**: Must output JSON to stdout
+- **Exit Code**: 0 for success, non-zero for failure
+- **Language**: Any language - bash, python, node, etc.
+
+### Test Metadata (README.md)
+
+Each test suite's README.md contains structured metadata:
+
+```markdown
+# feature-name
+
+**tags**: \`tag1\`, \`tag2\`, \`tag3\`
+**what**: Brief description of what this test validates
+**depends**: tests/prerequisite/test
+**priority**: high|medium|low
+
+## description
+
+Detailed description of test purpose and behavior.
+
+## scenarios
+
+- \`scenario-name\` - What this scenario tests
+
+## ai notes
+
+run this when: [AI guidance - when to run this test]
+skip this when: [AI guidance - when to skip this test]
+after this: [AI guidance - what to run after this passes]
+```
+
+## Metadata Fields Explained
+
+### For Humans
+
+- **tags**: Categories for filtering (e.g., `auth`, `api`, `critical`)
+- **what**: One-line summary of test purpose
+- **depends**: Other tests that must pass first
+- **priority**: Importance level (high/medium/low)
+
+### For AI Assistants
+
+- **tags**: Enable semantic test selection ("run all auth tests")
+- **what**: Helps AI understand test purpose without reading code
+- **depends**: Enables dependency-aware test execution
+- **priority**: Helps AI prioritize which tests to run first
+- **ai notes**: Direct guidance on when to run/skip tests
+
+## Test Organization Best Practices
+
+### Directory Structure
+
+Organize tests hierarchically by feature area:
+
+```
+tests/
+├── auth/
+│   ├── login/
+│   ├── logout/
+│   └── password-reset/
+├── api/
+│   ├── users/
+│   ├── posts/
+│   └── comments/
+└── integration/
+    ├── checkout-flow/
+    └── signup-flow/
+```
+
+### Naming Conventions
+
+- **lowercase-with-hyphens**: `user-login`, not `UserLogin` or `user_login`
+- **descriptive**: `api-create-post`, not `test1` or `api-test`
+- **feature-focused**: Name after what you're testing, not the test type
+
+### Tag Strategy
+
+Common tag patterns:
+
+- **By layer**: `unit`, `integration`, `e2e`
+- **By feature**: `auth`, `payments`, `search`
+- **By priority**: `critical`, `smoke`, `regression`
+- **By state**: `pending`, `flaky`, `deprecated`
+
+### Multiple Scenarios
+
+Add scenarios by creating new directories under `data/`:
+
+```
+tests/user-login/
+├── run
+├── README.md
+└── data/
+    ├── valid-credentials/
+    │   ├── input.json
+    │   └── expected.json
+    ├── invalid-password/
+    │   ├── input.json
+    │   └── expected.json
+    └── expired-token/
+        ├── input.json
+        └── expected.json
+```
+
+Each scenario tests a different aspect of the same feature.
+
+## JSON Comparison
+
+tc uses **semantic JSON comparison** (order-independent):
+
+```json
+// These are considered EQUAL:
+{"name": "Alice", "age": 30}
+{"age": 30, "name": "Alice"}
+
+// Array order DOES matter:
+[1, 2, 3] ≠ [3, 2, 1]
+```
+
+## AI Integration Guide
+
+### For AI Assistants Reading This
+
+When working with tests in this directory:
+
+1. **Discovery**: Use `tc list tests` to see all available tests
+2. **Understanding**: Use `tc explain <test>` to understand what a test does
+3. **Selection**: Use `tc tags` to see available tags, then filter with `--tags`
+4. **Execution**: Run tests relevant to code changes
+5. **Creation**: Use `tc new <path>` to generate new test scaffolding
+
+### Running Tests Based on Code Changes
+
+- **Changed auth code?** → `tc run tests --tags auth`
+- **Changed API endpoints?** → `tc run tests --tags api`
+- **Critical deployment?** → `tc run tests --tags critical`
+- **Everything?** → `tc run tests --all`
+
+### Test-Driven Development
+
+1. Generate test: `tc new tests/feature-name`
+2. Edit `input.json` and `expected.json` with realistic data
+3. Run test - it will fail (NOT_IMPLEMENTED)
+4. Implement feature
+5. Run test - it should pass
+6. Refactor with confidence
+
+### Reading Test Results
+
+Test results are stored in `.tc-result` files (gitignored):
+
+```json
+{
+  "suite": "user-login",
+  "scenario": "valid-credentials",
+  "status": "pass|fail|error",
+  "duration_ms": 42,
+  "timestamp": "2025-10-12T01:30:00Z"
+}
+```
+
+## Language-Agnostic Testing
+
+tc doesn't care what language your `run` script uses:
+
+### Bash
+```bash
+#!/usr/bin/env bash
+input="$1"
+name=$(jq -r '.name' "$input")
+echo "{\"greeting\": \"Hello, $name!\"}"
+```
+
+### Python
+```python
+#!/usr/bin/env python3
+import sys, json
+data = json.load(open(sys.argv[1]))
+print(json.dumps({"greeting": f"Hello, {data['name']}!"}))
+```
+
+### Node.js
+```javascript
+#!/usr/bin/env node
+const data = require(process.argv[2]);
+console.log(JSON.stringify({greeting: `Hello, ${data.name}!`}));
+```
+
+### Any Language
+
+As long as it:
+1. Reads JSON from file path in `$1`
+2. Outputs JSON to stdout
+3. Exits 0 on success, non-zero on failure
+
+## Troubleshooting
+
+### Test Won't Run
+
+```bash
+# Make sure run script is executable
+chmod +x tests/my-feature/run
+
+# Check for syntax errors
+bash -n tests/my-feature/run
+```
+
+### Test Fails Unexpectedly
+
+```bash
+# Check actual vs expected output
+cat tests/my-feature/.tc-result
+
+# Run with debug logging
+TC_LOG_LEVEL=0 tc run tests/my-feature
+```
+
+### Test Not Showing in `tc list`
+
+- Ensure `README.md` exists with proper metadata format
+- Check that metadata fields start with `**field**:`
+- Tags must be backtick-wrapped: \`tag-name\`
+
+## Getting Help
+
+```bash
+# Show tc help
+tc --help
+
+# Show version
+tc --version
+
+# Explain a specific test
+tc explain tests/my-feature
+```
+
+## Philosophy
+
+> "Start with a test that fails for the right reason, end with code that passes for the right reason."
+
+tc enforces TDD by making the failing test the starting point. When you run `tc new`, you get a test that fails with a clear message: "NOT_IMPLEMENTED". Your job is to make it pass.
+
+---
+
+**Note**: This README is generated by `tc init`. Edit it to match your project's specific testing patterns and conventions.
+
+🚁 Happy testing!
