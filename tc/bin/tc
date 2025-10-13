@@ -97,25 +97,55 @@ tc_run_command() {
     local run_all=false
     local filter_tags=""
     local parallel_jobs=""
+    local no_args_given=false
+
+    # Track if no arguments were given (for better error messages)
+    if [ -z "$1" ]; then
+        no_args_given=true
+    fi
 
     # Smart path resolution (KISS)
-    # 1. @all or empty → run all tests in $TC_ROOT/tests
+    # 1. @all or empty → run all tests (check ./tests first, then $TC_ROOT/tests)
     # 2. @group → future: run tagged group (e.g., @auth)
     # 3. Paths starting with . or / → absolute, use as-is
-    # 4. Other paths → relative to $TC_ROOT/tests
+    # 4. Other paths → relative to ./tests or $TC_ROOT/tests
     if [ "$suite_path" = "@all" ] || [ -z "$suite_path" ]; then
-        suite_path="$TC_ROOT/tests"
+        # Check for local tests directory first
+        if [ -d "./tests" ]; then
+            suite_path="./tests"
+        elif [ "$no_args_given" = true ]; then
+            # No args given and no local tests - show helpful message
+            tc_error "no tests directory found"
+            echo "" >&2
+            echo "To get started:" >&2
+            echo "  tc init              # initialize test directory" >&2
+            echo "  tc new my-test       # create your first test" >&2
+            echo "" >&2
+            echo "Or run 'tc --help' for more options" >&2
+            exit 1
+        else
+            # Fallback to tc framework tests (for examples/development)
+            suite_path="$TC_ROOT/tests"
+        fi
         run_all=true
     elif [[ "$suite_path" =~ ^@ ]]; then
         # Future: @group support (e.g., @auth, @integration)
         local group_name="${suite_path#@}"
         tc_info "running test group: @$group_name"
-        suite_path="$TC_ROOT/tests"
+        if [ -d "./tests" ]; then
+            suite_path="./tests"
+        else
+            suite_path="$TC_ROOT/tests"
+        fi
         filter_tags="$group_name"
         run_all=true
     elif [[ ! "$suite_path" =~ ^[./] ]]; then
-        # Relative path - resolve to $TC_ROOT/tests/
-        suite_path="$TC_ROOT/tests/$suite_path"
+        # Relative path - resolve to ./tests/ first, then $TC_ROOT/tests/
+        if [ -e "./tests/$suite_path" ]; then
+            suite_path="./tests/$suite_path"
+        else
+            suite_path="$TC_ROOT/tests/$suite_path"
+        fi
     fi
     # else: absolute path (starts with . or /) - use as-is
 
