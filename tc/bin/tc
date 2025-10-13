@@ -140,8 +140,11 @@ tc_run_command() {
         filter_tags="$group_name"
         run_all=true
     elif [[ ! "$suite_path" =~ ^[./] ]]; then
-        # Relative path - resolve to ./tests/ first, then $TC_ROOT/tests/
-        if [ -e "./tests/$suite_path" ]; then
+        # Relative path - check if it exists as-is first, then try ./tests/, then $TC_ROOT/tests/
+        if [ -e "$suite_path" ]; then
+            # Path exists from current directory - use as-is
+            suite_path="$suite_path"
+        elif [ -e "./tests/$suite_path" ]; then
             suite_path="./tests/$suite_path"
         else
             suite_path="$TC_ROOT/tests/$suite_path"
@@ -187,6 +190,11 @@ tc_run_command() {
     if [ ! -e "$suite_path" ]; then
         tc_error "path not found: $suite_path"
         exit 1
+    fi
+
+    # if path is a directory (not a single suite), enable run_all mode
+    if [ -d "$suite_path" ] && ! tc_is_test_suite "$suite_path"; then
+        run_all=true
     fi
 
     # run all suites in directory tree
