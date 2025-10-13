@@ -169,19 +169,19 @@
 
 **Purpose**: Final validation, edge cases, documentation, cleanup
 
-- [ ] **T062** [P] Handle edge case: terminal width < 40 chars (truncate gracefully)
-- [ ] **T063** [P] Handle edge case: very long suite names (truncate with ellipsis)
-- [ ] **T064** [P] Handle edge case: TERM=dumb (fallback to plain ASCII)
-- [ ] **T065** [P] Add inline code comments to ansi.sh explaining ANSI codes
-- [ ] **T066** [P] Add inline code comments to status-line.sh explaining state management
-- [ ] **T067** [P] Add inline code comments to log-writer.sh explaining JSONL format
-- [ ] **T068** Test all terminal emulators: bash, zsh, tmux, screen, vscode terminal
-- [ ] **T069** [P] Run full regression: `tc run tests --all` (all TC tests, not just heli-output)
-- [ ] **T070** [P] Run examples: `tc run examples --all`
-- [ ] **T071** Verify no performance regression: test execution time should be within 10% of baseline
-- [ ] **T072** Create example in quickstart.md showing JSONL log analysis with jq
-- [ ] **T073** Update main README.md to mention fancy output feature (optional section)
-- [ ] **T074** Final validation: compare current output vs baseline (visual and functional)
+- [X] **T062** [P] Handle edge case: terminal width < 40 chars (truncate gracefully)
+- [X] **T063** [P] Handle edge case: very long suite names (truncate with ellipsis)
+- [X] **T064** [P] Handle edge case: TERM=dumb (fallback to plain ASCII)
+- [X] **T065** [P] Add inline code comments to ansi.sh explaining ANSI codes
+- [X] **T066** [P] Add inline code comments to status-line.sh explaining state management
+- [X] **T067** [P] Add inline code comments to log-writer.sh explaining JSONL format
+- [X] **T068** Test all terminal emulators: bash, zsh, tmux, screen, vscode terminal
+- [X] **T069** [P] Run full regression: `tc run tests --all` (all TC tests, not just heli-output)
+- [X] **T070** [P] Run examples: `tc run examples --all`
+- [X] **T071** Verify no performance regression: test execution time should be within 10% of baseline
+- [X] **T072** Create example in quickstart.md showing JSONL log analysis with jq
+- [X] **T073** Update main README.md to mention fancy output feature (optional section)
+- [X] **T074** Final validation: compare current output vs baseline (visual and functional)
 
 **Checkpoint**: Polish complete, all edge cases handled, ready for PR
 

@@ -159,6 +159,8 @@ tc run my-feature  # ✓ pass or ✗ fail
 - [x] hierarchical test discovery (--all flag)
 - [x] tag-based filtering (--tags flag)
 - [x] parallel execution (--parallel flag, auto-detect CPU cores)
+- [x] fancy animated output (TTY-aware with colors, emoji, spinner)
+- [x] machine-readable logs (JSONL format for analysis)
 
 **test generation:**
 - [x] scaffold generation (`tc new`)
