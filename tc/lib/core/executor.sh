@@ -17,6 +17,9 @@ tc_execute_suite() {
 
     tc_info "executing suite: $suite_dir"
 
+    # initialize status line (T018)
+    tc_status_init
+
     # load suite-specific configuration if present
     if [ -f "$suite_dir/config.sh" ]; then
         tc_debug "loading suite config: $suite_dir/config.sh"
@@ -28,6 +31,7 @@ tc_execute_suite() {
     if [ $? -ne 0 ]; then
         tc_error "suite validation failed:"
         echo "$validation_errors" >&2
+        tc_status_finish 0 0  # cleanup
         return 1
     fi
 
@@ -41,6 +45,9 @@ tc_execute_suite() {
 
     tc_info "found $scenario_count scenario(s)"
 
+    # Get suite name for status line
+    local suite_name=$(basename "$suite_dir")
+
     # results tracking
     local passed=0
     local failed=0
@@ -53,6 +60,9 @@ tc_execute_suite() {
 
         tc_progress "  $scenario_name"
 
+        # Update status line (T019) - test starting
+        tc_status_update "$suite_name" "$scenario_name" "running" "$passed" "$failed"
+
         # validate scenario
         local scenario_errors=$(tc_validate_scenario "$scenario_dir")
         if [ $? -ne 0 ]; then
@@ -60,6 +70,8 @@ tc_execute_suite() {
             tc_error "scenario validation failed: $scenario_errors"
             ((errors++))
             results+=("$scenario_name|error|0|validation failed")
+            # Update status line after failure
+            tc_status_update "$suite_name" "$scenario_name" "failed" "$passed" "$((failed + errors))"
             continue
         fi
 
@@ -69,6 +81,8 @@ tc_execute_suite() {
             tc_progress_fail
             ((errors++))
             results+=("$scenario_name|error|0|runner failed")
+            # Update status line after failure
+            tc_status_update "$suite_name" "$scenario_name" "failed" "$passed" "$((failed + errors))"
             continue
         fi
 
@@ -82,6 +96,8 @@ tc_execute_suite() {
             ((errors++))
             results+=("$scenario_name|timeout|$duration|exceeded timeout")
             tc_cleanup_runner_output "$output_file" "$stderr_file"
+            # Update status line after failure
+            tc_status_update "$suite_name" "$scenario_name" "failed" "$passed" "$((failed + errors))"
             continue
         elif [ "$exit_code" -ne 0 ]; then
             tc_progress_fail
@@ -89,6 +105,8 @@ tc_execute_suite() {
             ((errors++))
             results+=("$scenario_name|error|$duration|exit code $exit_code")
             tc_cleanup_runner_output "$output_file" "$stderr_file"
+            # Update status line after failure
+            tc_status_update "$suite_name" "$scenario_name" "failed" "$passed" "$((failed + errors))"
             continue
         fi
 
@@ -103,11 +121,15 @@ tc_execute_suite() {
             tc_progress_done
             ((passed++))
             results+=("$scenario_name|pass|$duration|")
+            # Update status line after pass (T019)
+            tc_status_update "$suite_name" "$scenario_name" "passed" "$passed" "$failed"
         else
             tc_progress_fail
             ((failed++))
             local diff=$(tc_generate_diff "$actual_output" "$scenario_dir/expected.json" | head -20)
             results+=("$scenario_name|fail|$duration|$diff")
+            # Update status line after failure (T019)
+            tc_status_update "$suite_name" "$scenario_name" "failed" "$passed" "$failed"
         fi
 
         # cleanup
@@ -115,6 +137,9 @@ tc_execute_suite() {
         tc_cleanup_runner_output "$output_file" "$stderr_file"
 
     done <<< "$scenarios"
+
+    # Finalize status line (T020)
+    tc_status_finish "$passed" "$failed"
 
     # return results (use ::: as separator between metadata and result lines)
     echo -n "$passed|$failed|$errors:::"

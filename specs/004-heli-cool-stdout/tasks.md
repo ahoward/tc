@@ -24,9 +24,9 @@
 
 **Purpose**: Project initialization and environment setup
 
-- [ ] **T001** Create feature test suite directory: `mkdir -p tc/tests/integration/heli-output/data`
-- [ ] **T002** [P] Create baseline commit with message "pre-heli-output checkpoint"
-- [ ] **T003** [P] Capture baseline test output: `tc run tests --all > /tmp/tc-baseline-output.txt 2>&1`
+- [X] **T001** Create feature test suite directory: `mkdir -p tc/tests/integration/heli-output/data`
+- [X] **T002** [P] Create baseline commit with message "pre-heli-output checkpoint"
+- [X] **T003** [P] Capture baseline test output: `tc run tests --all > /tmp/tc-baseline-output.txt 2>&1`
 
 **Checkpoint**: Baseline established, safe to proceed with implementation
 
@@ -38,14 +38,14 @@
 
 **⚠️ CRITICAL**: No user story work can begin until this phase is complete
 
-- [ ] **T004** Create `tc/lib/utils/ansi.sh` with ANSI color constants and basic functions
-- [ ] **T005** Implement `tc_ansi_supported()` function for TTY/ANSI capability detection in `ansi.sh`
-- [ ] **T006** Implement `tc_ansi_color(name)` function (green/red/yellow/reset) in `ansi.sh`
-- [ ] **T007** Implement `tc_ansi_clear_line()` function in `ansi.sh`
-- [ ] **T008** [P] Implement `tc_ansi_hide_cursor()` and `tc_ansi_show_cursor()` in `ansi.sh`
-- [ ] **T009** Add ansi.sh module to tc/bin/tc: `source "$TC_ROOT/lib/utils/ansi.sh"`
-- [ ] **T010** Update `tc/config/defaults.sh` to add TC_FANCY_OUTPUT, TC_REPORT_DIR, TC_LOG_FILE env vars
-- [ ] **T011** Update `tc/config/defaults.sh` to add TC_NO_ANIMATION, TC_NO_COLOR env vars with defaults
+- [X] **T004** Create `tc/lib/utils/ansi.sh` with ANSI color constants and basic functions
+- [X] **T005** Implement `tc_ansi_supported()` function for TTY/ANSI capability detection in `ansi.sh`
+- [X] **T006** Implement `tc_ansi_color(name)` function (green/red/yellow/reset) in `ansi.sh`
+- [X] **T007** Implement `tc_ansi_clear_line()` function in `ansi.sh`
+- [X] **T008** [P] Implement `tc_ansi_hide_cursor()` and `tc_ansi_show_cursor()` in `ansi.sh`
+- [X] **T009** Add ansi.sh module to tc/bin/tc: `source "$TC_ROOT/lib/utils/ansi.sh"`
+- [X] **T010** Update `tc/config/defaults.sh` to add TC_FANCY_OUTPUT, TC_REPORT_DIR, TC_LOG_FILE env vars
+- [X] **T011** Update `tc/config/defaults.sh` to add TC_NO_ANIMATION, TC_NO_COLOR env vars with defaults
 
 **Checkpoint**: Foundation ready - ANSI utilities and configuration available
 
@@ -59,16 +59,16 @@
 
 ### Implementation for User Story 1
 
-- [ ] **T012** [US1] Create `tc/lib/utils/status-line.sh` file structure with header comments
-- [ ] **T013** [US1] Implement `tc_terminal_width()` function in `status-line.sh` (uses tput cols, fallback 80)
-- [ ] **T014** [US1] Implement `tc_status_init()` function in `status-line.sh` (detect TTY mode, init state vars)
-- [ ] **T015** [US1] Implement basic `tc_status_update(suite, test, status, passed, failed)` in `status-line.sh` (TTY: CR+rewrite, non-TTY: new line)
-- [ ] **T016** [US1] Implement `tc_status_finish(passed, failed)` in `status-line.sh` (show cursor, print summary)
-- [ ] **T017** [US1] Add status-line.sh module to tc/bin/tc: `source "$TC_ROOT/lib/utils/status-line.sh"`
-- [ ] **T018** [US1] Update `tc/lib/core/executor.sh` to call `tc_status_init()` before suite execution
-- [ ] **T019** [US1] Update `tc/lib/core/executor.sh` to call `tc_status_update()` on each test completion
-- [ ] **T020** [US1] Update `tc/lib/core/executor.sh` to call `tc_status_finish()` after suite completes
-- [ ] **T021** [US1] Update `tc/lib/utils/reporter.sh` to detect TTY mode and skip multi-line output if fancy mode active
+- [X] **T012** [US1] Create `tc/lib/utils/status-line.sh` file structure with header comments
+- [X] **T013** [US1] Implement `tc_terminal_width()` function in `status-line.sh` (uses tput cols, fallback 80)
+- [X] **T014** [US1] Implement `tc_status_init()` function in `status-line.sh` (detect TTY mode, init state vars)
+- [X] **T015** [US1] Implement basic `tc_status_update(suite, test, status, passed, failed)` in `status-line.sh` (TTY: CR+rewrite, non-TTY: new line)
+- [X] **T016** [US1] Implement `tc_status_finish(passed, failed)` in `status-line.sh` (show cursor, print summary)
+- [X] **T017** [US1] Add status-line.sh module to tc/bin/tc: `source "$TC_ROOT/lib/utils/status-line.sh"`
+- [X] **T018** [US1] Update `tc/lib/core/executor.sh` to call `tc_status_init()` before suite execution
+- [X] **T019** [US1] Update `tc/lib/core/executor.sh` to call `tc_status_update()` on each test completion
+- [X] **T020** [US1] Update `tc/lib/core/executor.sh` to call `tc_status_finish()` after suite completes
+- [X] **T021** [US1] Update `tc/lib/utils/reporter.sh` to detect TTY mode and skip multi-line output if fancy mode active
 
 ### Testing for User Story 1
 

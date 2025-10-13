@@ -1,3 +1,15 @@
+
+TODO
+====
+- world class zombie prevention via monitor
+- /slash commands
+- Run ./scripts/slack_export --hours 24
+<internal:/opt/hostedtoolcache/Ruby/3.2.9/x64/lib/ruby/3.2.0/rubygems/core_ext/kernel_require.rb>:86:in `require': cannot load such file -- parallel (LoadError)
+	from <internal:/opt/hostedtoolcache/Ruby/3.2.9/x64/lib/ruby/3.2.0/rubygems/core_ext/kernel_require.rb>:86:in `require'
+	from ./scripts/slack_export:97:in `<main>'
+Error: Process completed with exit code 1.
+- ensure streaming inputs is compatible with logs fmt/jsonl
+
 DOIN
 ====
 
@@ -20,16 +32,6 @@ being run, etc), to be output into a sane location (report.json).  this log
 should perhaps be jsonl, or whatever steaming format 'tc' itself handled.
 aka, whatever format would be easy to filter with the same strategy as multi
 input tests.
-
-TODO
-====
-- world class zombie prevention via monitor
-- /slash commands
-- Run ./scripts/slack_export --hours 24
-<internal:/opt/hostedtoolcache/Ruby/3.2.9/x64/lib/ruby/3.2.0/rubygems/core_ext/kernel_require.rb>:86:in `require': cannot load such file -- parallel (LoadError)
-	from <internal:/opt/hostedtoolcache/Ruby/3.2.9/x64/lib/ruby/3.2.0/rubygems/core_ext/kernel_require.rb>:86:in `require'
-	from ./scripts/slack_export:97:in `<main>'
-Error: Process completed with exit code 1.
 
 
 DONE
