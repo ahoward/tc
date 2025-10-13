@@ -136,16 +136,16 @@
 
 **Purpose**: Final validation, cleanup, documentation polish
 
-- [ ] T047 [P] Run full regression suite: `tc run tc/tests --all` and compare to baseline
-- [ ] T048 [P] Validate examples still work: `tc run examples/hello-world`
-- [ ] T049 Check for broken symlinks or orphaned files: `find . -xtype l`
-- [ ] T050 Update CLAUDE.md: Add note about new structure (already done by agent script)
-- [ ] T051 Verify .gitignore excludes appropriate files
-- [ ] T052 Clean up any temporary test artifacts
-- [ ] T053 [P] Review all documentation for consistency
-- [ ] T054 [P] Update any internal path references in comments
-- [ ] T055 Create upgrade guide for users (section in README.md)
-- [ ] T056 Final validation: Run `tc --version && tc run tests --all && tc new /tmp/final-test`
+- [x] T047 [P] Run full regression suite: `tc run tc/tests --all` and compare to baseline
+- [x] T048 [P] Validate examples still work: `tc run examples/hello-world`
+- [x] T049 Check for broken symlinks or orphaned files: `find . -xtype l`
+- [x] T050 Update CLAUDE.md: Add note about new structure (already done by agent script)
+- [x] T051 Verify .gitignore excludes appropriate files
+- [x] T052 Clean up any temporary test artifacts
+- [x] T053 [P] Review all documentation for consistency
+- [x] T054 [P] Update any internal path references in comments
+- [x] T055 Create upgrade guide for users (section in README.md)
+- [x] T056 Final validation: Run `tc --version && tc run tests --all && tc new /tmp/final-test`
 
 **Checkpoint**: Refactoring complete, all tests passing, documentation current
 
