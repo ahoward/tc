@@ -19,13 +19,47 @@ language-agnostic testing for unix hackers
    🚁  island hopper
 ```
 
+## ⚠️  IMPORTANT: `tc` is a Unix builtin command!
+
+**`tc` is a traffic control command on many Unix systems.** You MUST ensure your project's `tc` comes first in PATH.
+
+### Recommended Setup (direnv)
+
+Create `.envrc` in your project root:
+```bash
+# .envrc
+PATH_add ./tc/bin
+```
+
+Then run `direnv allow` once. Your shell will automatically use the correct `tc` when you `cd` into your project.
+
+**Without direnv**, you'll need to manually set PATH per-project:
+```bash
+export PATH="$PWD/tc/bin:$PATH"
+```
+
+**Verify you're using the right tc:**
+```bash
+which tc
+# Should show: /your/project/tc/bin/tc (NOT /usr/sbin/tc)
+
+tc --version
+# Should show: tc v1.0.0 - island hopper (NOT traffic control info)
+```
+
 ## quickstart
 
 ```bash
 # clone and install
 git clone https://github.com/ahoward/tc.git
 cd tc
+
+# CRITICAL: Add tc to PATH for this project
 export PATH="$PWD/tc/bin:$PATH"
+# Better: use direnv (see above)
+
+# verify you're running the right tc
+which tc  # should show ./tc/bin/tc
 
 # generate your first test
 tc new tests/my-feature
@@ -149,10 +183,59 @@ tc run my-feature  # ✓ pass or ✗ fail
 
 ## installation
 
+### ⚠️  Name Collision Warning
+
+**CRITICAL**: `tc` conflicts with the Unix traffic control command (`/usr/sbin/tc`).
+
+You MUST use per-project PATH management to ensure the correct `tc` runs:
+
+**✅ RECOMMENDED: Use direnv**
+```bash
+# In your project root:
+echo 'PATH_add ./tc/bin' > .envrc
+direnv allow
+```
+
+**⚠️  ALTERNATIVE: Manual PATH per shell session**
+```bash
+export PATH="$PWD/tc/bin:$PATH"
+```
+
+**❌ DO NOT install to /usr/local/bin or system-wide locations** - this will conflict with system `tc` command.
+
+**Always verify:**
+```bash
+which tc          # must show: ./tc/bin/tc
+tc --version      # must show: tc v1.0.0 - island hopper
+```
+
 ### prerequisites
 
 - bash 4.0+ (or compatible shell)
 - jq (for json processing)
+- **direnv** (highly recommended for PATH management)
+
+### install direnv (recommended)
+
+```bash
+# macos
+brew install direnv
+
+# ubuntu/debian
+sudo apt-get install direnv
+
+# fedora/rhel
+sudo dnf install direnv
+
+# arch
+sudo pacman -S direnv
+
+# then add to your shell (bash example):
+echo 'eval "$(direnv hook bash)"' >> ~/.bashrc
+source ~/.bashrc
+
+# for other shells: https://direnv.net/docs/hook.html
+```
 
 ### install jq
 
@@ -174,48 +257,60 @@ sudo pacman -S jq
 
 ### install tc
 
-**option 1: add to PATH (recommended for development)**
+**RECOMMENDED: per-project installation with direnv**
 
-Best for trying out tc or active development.
+Best practice to avoid conflicts with Unix `tc` command.
 
 ```bash
+# In your project root:
+git clone https://github.com/ahoward/tc.git
+
+# Create .envrc for automatic PATH management
+echo 'PATH_add ./tc/bin' > .envrc
+direnv allow
+
+# Verify
+which tc          # should show: ./tc/bin/tc
+tc --version      # should show: tc v1.0.0 - island hopper
+```
+
+*Pros: No conflicts, automatic PATH switching, clean per-project isolation*
+*Use case: ALL projects - this is the recommended approach*
+
+**ALTERNATIVE: manual PATH per-project**
+
+Without direnv, you'll need to set PATH manually:
+
+```bash
+# In your project root:
 git clone https://github.com/ahoward/tc.git
 cd tc
 export PATH="$PWD/tc/bin:$PATH"
-echo 'export PATH="'$PWD'/tc/bin:$PATH"' >> ~/.bashrc  # persist
+
+# Add to shell config (optional, but remember - this affects ALL projects):
+echo 'export PATH="'$PWD'/tc/bin:$PATH"' >> ~/.bashrc
 ```
 
-*Pros: Easy to update (git pull), no sudo required, keeps everything in one location*
-*Use case: Development, testing, personal projects*
+*Pros: Simple, no extra tools*
+*Cons: Manual PATH management, easy to forget*
+*Use case: Quick testing, single project*
 
-**option 2: symlink to /usr/local/bin**
+**❌ NOT RECOMMENDED: system-wide installation**
 
-Lightweight system-wide installation.
+Installing tc system-wide creates conflicts with Unix traffic control command.
 
+If you absolutely must:
 ```bash
 git clone https://github.com/ahoward/tc.git
 cd tc
-sudo ln -s "$PWD/tc/bin/tc" /usr/local/bin/tc
+# Option: Copy to /opt/tc and add to PATH
+sudo cp -r tc /opt/tc
+export PATH="/opt/tc/bin:$PATH"
 ```
 
-*Pros: System-wide access, still connected to repo for updates*
-*Note: Library files remain in cloned directory - don't delete the repo*
-*Use case: Personal machines, development systems*
-
-**option 3: copy to /usr/local/bin (recommended for production)**
-
-Full system installation, standalone.
-
-```bash
-git clone https://github.com/ahoward/tc.git
-cd tc
-sudo cp -r tc /usr/local/
-export PATH="/usr/local/tc/bin:$PATH"
-```
-
-*Pros: True system install, works even if you delete the clone, no git dependency*
-*Cons: Must manually update (copy again) when upgrading*
-*Use case: Production servers, CI/CD systems, containers*
+*⚠️  Warning: May conflict with system tc command*
+*⚠️  You'll need to always use full path: /opt/tc/bin/tc*
+*Use case: Containers, CI systems where you control the environment*
 
 ### verify installation
 
@@ -243,7 +338,33 @@ made with ☕ and helicopters
 
 if you have tc installed with the old structure (before v1.1), follow these steps to upgrade:
 
-### for PATH installations
+### ⚠️  IMPORTANT: Switch to direnv (recommended)
+
+The old global PATH approach conflicts with Unix `tc` command. Switch to per-project direnv:
+
+```bash
+cd /path/to/tc/repo
+git pull
+
+# Remove old global PATH from shell config
+# Delete these lines from ~/.bashrc or ~/.zshrc:
+#   export PATH="/path/to/tc/bin:$PATH"
+#   export PATH="/path/to/tc/tc:$PATH"
+
+# Install direnv (if not already)
+brew install direnv  # or apt-get, dnf, etc.
+eval "$(direnv hook bash)"  # add to ~/.bashrc
+
+# Create .envrc in tc repo
+echo 'PATH_add ./tc/bin' > .envrc
+direnv allow
+
+# Verify
+which tc        # should show ./tc/bin/tc
+tc --version    # verify
+```
+
+### for manual PATH installations (not recommended)
 
 ```bash
 cd /path/to/tc/repo
@@ -256,29 +377,37 @@ export PATH="$PWD/tc/bin:$PATH"
 tc --version  # verify
 ```
 
-### for symlink installations
+**⚠️  Warning**: This still conflicts with system `tc`. Use direnv instead.
+
+### for symlink installations (migrate to direnv)
+
+**Old symlink approach conflicts with system tc. Switch to direnv:**
 
 ```bash
 cd /path/to/tc/repo
 git pull
-# remove old symlink
+
+# Remove old symlink
 sudo rm /usr/local/bin/tc
-# create new symlink
-sudo ln -s "$PWD/tc/bin/tc" /usr/local/bin/tc
-tc --version  # verify
+
+# Use direnv instead (see above)
+echo 'PATH_add ./tc/bin' > .envrc
+direnv allow
 ```
 
-### for copy installations
+### for copy installations (migrate to direnv)
+
+**Old copy approach conflicts with system tc. Switch to direnv:**
 
 ```bash
 cd /path/to/tc/repo
 git pull
-# remove old installation
-sudo rm -rf /usr/local/tc /usr/local/lib/tc
-# copy new structure
-sudo cp -r tc /usr/local/
-export PATH="/usr/local/tc/bin:$PATH"
-echo 'export PATH="/usr/local/tc/bin:$PATH"' >> ~/.bashrc  # persist
-tc --version  # verify
+
+# Remove old installation
+sudo rm -rf /usr/local/tc
+
+# Use direnv instead (see above)
+echo 'PATH_add ./tc/bin' > .envrc
+direnv allow
 ```
 
