@@ -1,6 +1,15 @@
 #!/usr/bin/env bash
-# tc defaults configuration
+# tc global configuration
 # the helicopter's flight plan 🚁
+#
+# Configuration hierarchy (highest to lowest priority):
+#   1. Environment variables (TC_* set before running tc)
+#   2. Suite-specific config.sh (optional file in test suite directory)
+#   3. This file (global defaults)
+#
+# To override for a specific suite, create config.sh in the suite directory
+# To override for a single run, set environment variables:
+#   TC_DEFAULT_TIMEOUT=600 tc run tests/my-suite
 
 # timeout settings (seconds)
 TC_DEFAULT_TIMEOUT=300          # 5 minutes default

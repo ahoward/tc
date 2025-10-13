@@ -82,16 +82,16 @@
 
 ### Implementation for User Story 2
 
-- [ ] T024 [P] [US2] Move framework self-tests: `git mv tests/ tc/tests/`
-- [ ] T025 [P] [US2] Update test discovery to exclude tc/tests from user test runs
-- [ ] T026 [P] [US2] Update README.md: Replace all `bin/tc` references with `tc/tc`
-- [ ] T027 [P] [US2] Update README.md: Replace all `lib/` references with `tc/lib/`
-- [ ] T028 [P] [US2] Update README.md: Update installation instructions (3 methods)
-- [ ] T029 [P] [US2] Update docs/readme.md: Replace path references
-- [ ] T030 [P] [US2] Update docs/tc-new.md: Replace path references
-- [ ] T031 [US2] Add code comments to `tc/tc`: Document TC_ROOT resolution logic
-- [ ] T032 [US2] Add code comments to `tc/config.sh`: Document configuration hierarchy
-- [ ] T033 [US2] Verify directory structure matches plan.md target layout
+- [x] T024 [P] [US2] Move framework self-tests: `git mv tests/ tc/tests/`
+- [x] T025 [P] [US2] Update test discovery to exclude tc/tests from user test runs
+- [x] T026 [P] [US2] Update README.md: Replace all `bin/tc` references with `tc/tc`
+- [x] T027 [P] [US2] Update README.md: Replace all `lib/` references with `tc/lib/`
+- [x] T028 [P] [US2] Update README.md: Update installation instructions (3 methods)
+- [x] T029 [P] [US2] Update docs/readme.md: Replace path references
+- [x] T030 [P] [US2] Update docs/tc-new.md: Replace path references
+- [x] T031 [US2] Add code comments to `tc/tc`: Document TC_ROOT resolution logic
+- [x] T032 [US2] Add code comments to `tc/config.sh`: Document configuration hierarchy
+- [x] T033 [US2] Verify directory structure matches plan.md target layout
 
 **Checkpoint**: User Story 2 complete - source organization clear, documentation updated
 

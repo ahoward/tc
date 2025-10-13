@@ -23,7 +23,7 @@ language-agnostic testing for unix hackers
 # clone and install
 git clone https://github.com/ahoward/tc.git
 cd tc
-export PATH="$PWD/bin:$PATH"
+export PATH="$PWD/tc:$PATH"
 
 # generate your first test
 tc new tests/my-feature
@@ -161,8 +161,8 @@ Best for trying out tc or active development.
 ```bash
 git clone https://github.com/ahoward/tc.git
 cd tc
-export PATH="$PWD/bin:$PATH"
-echo 'export PATH="'$PWD'/bin:$PATH"' >> ~/.bashrc  # persist
+export PATH="$PWD/tc:$PATH"
+echo 'export PATH="'$PWD'/tc:$PATH"' >> ~/.bashrc  # persist
 ```
 
 *Pros: Easy to update (git pull), no sudo required, keeps everything in one location*
@@ -175,7 +175,7 @@ Lightweight system-wide installation.
 ```bash
 git clone https://github.com/ahoward/tc.git
 cd tc
-sudo ln -s "$PWD/bin/tc" /usr/local/bin/tc
+sudo ln -s "$PWD/tc/tc" /usr/local/bin/tc
 ```
 
 *Pros: System-wide access, still connected to repo for updates*
@@ -189,7 +189,8 @@ Full system installation, standalone.
 ```bash
 git clone https://github.com/ahoward/tc.git
 cd tc
-sudo cp -r bin lib /usr/local/
+sudo cp -r tc /usr/local/
+export PATH="/usr/local/tc:$PATH"
 ```
 
 *Pros: True system install, works even if you delete the clone, no git dependency*

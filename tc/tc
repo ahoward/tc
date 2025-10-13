@@ -9,6 +9,12 @@ TC_VERSION="1.0.0"
 TC_CODENAME="island hopper"
 
 # find tc root directory
+# BASH_SOURCE[0] is the path to this script (tc/tc)
+# dirname gives us the directory containing it (tc/)
+# We resolve to absolute path - works for all installation methods:
+#   - Direct: ./tc/tc → TC_ROOT=/path/to/repo/tc
+#   - Symlink: /usr/local/bin/tc → /repo/tc/tc → TC_ROOT=/repo/tc
+#   - Copy: /usr/local/tc/tc → TC_ROOT=/usr/local/tc
 TC_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 # source global configuration

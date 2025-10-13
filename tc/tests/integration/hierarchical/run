@@ -35,7 +35,7 @@ RUNNER_EOF
 done
 
 # run tc --all on the directory
-output=$("$TC_ROOT/bin/tc" run "$tmpdir" --all 2>&1)
+output=$("$TC_ROOT/tc" run "$tmpdir" --all 2>&1)
 
 # check that it found all suites
 if echo "$output" | grep -q "found $num_suites suite(s)"; then
