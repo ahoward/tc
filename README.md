@@ -9,12 +9,11 @@ language-agnostic testing for unix hackers
 </p>
 
 ```
-     _____
-    /     \      tc v1.0.0 - island hopper
-   | () () |     testing any language, anywhere
-    \  ^  /
-     |||||
-     |||||
+      ___
+     /   \___     tc v1.0.0 - island hopper
+    |  TC   |    testing any language, anywhere
+     \_____/
+       | |       🚁 fly safe, test well
 ```
 
 ## quickstart
