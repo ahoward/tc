@@ -233,6 +233,9 @@ tc_run_command() {
         exit 1
     fi
 
+    # Initialize fancy output (status line) early to suppress INFO logging
+    tc_status_init
+
     # check if path exists
     if [ ! -e "$suite_path" ]; then
         tc_error "path not found: $suite_path"

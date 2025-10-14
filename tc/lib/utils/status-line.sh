@@ -88,9 +88,11 @@ tc_status_init() {
     TC_STATUS_LABEL="RUNNING"
     TC_TERMINAL_WIDTH=$(tc_terminal_width)
 
-    # Hide cursor in TTY mode
+    # Suppress INFO logging in TTY mode (show only status line + errors)
     if [ "$TC_STATUS_MODE" = "tty" ]; then
-        tc_ansi_hide_cursor
+        tc_ansi_hide_cursor >&2
+        # Set log level to ERROR (3) to suppress INFO messages
+        TC_LOG_LEVEL=3
     fi
 
     return 0
