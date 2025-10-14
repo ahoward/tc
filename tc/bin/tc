@@ -118,9 +118,33 @@ tc_run_command() {
             local has_suites=$(tc_discover_suites_recursive "$expanded_tests" 2>/dev/null | wc -l)
             if [ "$has_suites" -gt 0 ]; then
                 suite_path="$expanded_tests"
-            elif [ "$no_args_given" = true ]; then
-                # ./tests exists but is empty, and no args given - show helpful message
-                tc_error "no tests directory found (./tests exists but is empty)"
+            else
+                # ./tests exists but is empty - try TC_ROOT/tests
+                local tc_suites=$(tc_discover_suites_recursive "$TC_ROOT/tests" 2>/dev/null | wc -l)
+                if [ "$tc_suites" -gt 0 ]; then
+                    suite_path="$TC_ROOT/tests"
+                elif [ "$no_args_given" = true ]; then
+                    # No tests found anywhere
+                    tc_error "no tests directory found (./tests exists but is empty)"
+                    echo "" >&2
+                    echo "To get started:" >&2
+                    echo "  tc init              # initialize test directory" >&2
+                    echo "  tc new my-test       # create your first test" >&2
+                    echo "" >&2
+                    echo "Or run 'tc --help' for more options" >&2
+                    exit 1
+                else
+                    suite_path="$TC_ROOT/tests"
+                fi
+            fi
+        elif [ "$no_args_given" = true ]; then
+            # No ./tests directory - try TC_ROOT/tests
+            local tc_suites=$(tc_discover_suites_recursive "$TC_ROOT/tests" 2>/dev/null | wc -l)
+            if [ "$tc_suites" -gt 0 ]; then
+                suite_path="$TC_ROOT/tests"
+            else
+                # No tests found anywhere - show helpful message
+                tc_error "no tests directory found"
                 echo "" >&2
                 echo "To get started:" >&2
                 echo "  tc init              # initialize test directory" >&2
@@ -128,20 +152,7 @@ tc_run_command() {
                 echo "" >&2
                 echo "Or run 'tc --help' for more options" >&2
                 exit 1
-            else
-                # ./tests exists but is empty, @all was explicit - fallback to tc framework tests
-                suite_path="$TC_ROOT/tests"
             fi
-        elif [ "$no_args_given" = true ]; then
-            # No args given and no local tests - show helpful message
-            tc_error "no tests directory found"
-            echo "" >&2
-            echo "To get started:" >&2
-            echo "  tc init              # initialize test directory" >&2
-            echo "  tc new my-test       # create your first test" >&2
-            echo "" >&2
-            echo "Or run 'tc --help' for more options" >&2
-            exit 1
         else
             # Fallback to tc framework tests (for examples/development)
             suite_path="$TC_ROOT/tests"
