@@ -17,9 +17,6 @@ tc_execute_suite() {
 
     tc_info "executing suite: $suite_dir"
 
-    # initialize status line (T018)
-    tc_status_init
-
     # initialize logging system (T053)
     tc_log_init
 
@@ -61,7 +58,10 @@ tc_execute_suite() {
     while read -r scenario_dir; do
         local scenario_name=$(tc_scenario_name "$scenario_dir")
 
-        tc_progress "  $scenario_name"
+        # Only show progress in non-TTY mode (status line handles TTY mode)
+        if [ "$TC_STATUS_MODE" != "tty" ]; then
+            tc_progress "  $scenario_name"
+        fi
 
         # Update status line (T019) - test starting
         tc_status_update "$suite_name" "$scenario_name" "running" "$passed" "$failed"
@@ -69,7 +69,7 @@ tc_execute_suite() {
         # validate scenario
         local scenario_errors=$(tc_validate_scenario "$scenario_dir")
         if [ $? -ne 0 ]; then
-            tc_progress_fail
+            [ "$TC_STATUS_MODE" != "tty" ] && tc_progress_fail
             tc_error "scenario validation failed: $scenario_errors"
             ((errors++))
             results+=("$scenario_name|error|0|validation failed")
@@ -83,7 +83,7 @@ tc_execute_suite() {
         # run scenario
         local runner_result=$(tc_run_scenario "$suite_dir" "$scenario_dir" "$timeout")
         if [ $? -ne 0 ]; then
-            tc_progress_fail
+            [ "$TC_STATUS_MODE" != "tty" ] && tc_progress_fail
             ((errors++))
             results+=("$scenario_name|error|0|runner failed")
             # Update status line after failure
@@ -98,7 +98,7 @@ tc_execute_suite() {
 
         # check exit code
         if [ "$exit_code" -eq 124 ]; then
-            tc_progress_fail
+            [ "$TC_STATUS_MODE" != "tty" ] && tc_progress_fail
             tc_error "timeout after ${timeout}s"
             ((errors++))
             results+=("$scenario_name|timeout|$duration|exceeded timeout")
@@ -109,7 +109,7 @@ tc_execute_suite() {
             tc_log_write "$suite_dir" "$scenario_name" "error" "$duration" "timeout after ${timeout}s"
             continue
         elif [ "$exit_code" -ne 0 ]; then
-            tc_progress_fail
+            [ "$TC_STATUS_MODE" != "tty" ] && tc_progress_fail
             tc_error "runner exited with code $exit_code"
             ((errors++))
             results+=("$scenario_name|error|$duration|exit code $exit_code")
@@ -129,7 +129,7 @@ tc_execute_suite() {
         local comparison_result=$?
 
         if [ "$comparison_result" -eq 0 ]; then
-            tc_progress_done
+            [ "$TC_STATUS_MODE" != "tty" ] && tc_progress_done
             ((passed++))
             results+=("$scenario_name|pass|$duration|")
             # Update status line after pass (T019)
@@ -137,7 +137,7 @@ tc_execute_suite() {
             # Write to log (T054)
             tc_log_write "$suite_dir" "$scenario_name" "pass" "$duration"
         else
-            tc_progress_fail
+            [ "$TC_STATUS_MODE" != "tty" ] && tc_progress_fail
             ((failed++))
             local diff=$(tc_generate_diff "$actual_output" "$scenario_dir/expected.json" | head -20)
             results+=("$scenario_name|fail|$duration|$diff")
@@ -153,8 +153,8 @@ tc_execute_suite() {
 
     done <<< "$scenarios"
 
-    # Finalize status line (T020)
-    tc_status_finish "$passed" "$failed"
+    # Don't finalize status line here - let the caller handle it
+    # This allows single-line updates to continue across multiple suites
 
     # return results (use ::: as separator between metadata and result lines)
     echo -n "$passed|$failed|$errors:::"

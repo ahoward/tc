@@ -279,6 +279,9 @@ tc_run_command() {
             [ -n "$line" ] && results+=("$line")
         done <<< "$rest"
 
+        # Finalize status line
+        tc_status_finish "$passed" "$failed"
+
         # report results
         tc_report_suite "$suite_path" "$passed" "$failed" "$errors" "${results[@]}"
 
@@ -373,6 +376,9 @@ tc_run_all_suites() {
 
         echo ""
     done <<< "$suites"
+
+    # Finalize status line after all suites complete
+    tc_status_finish "$total_passed" "$total_failed"
 
     # print overall summary
     echo "===================================="
