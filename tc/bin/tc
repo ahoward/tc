@@ -110,9 +110,28 @@ tc_run_command() {
     # 3. Paths starting with . or / → absolute, use as-is
     # 4. Other paths → relative to ./tests or $TC_ROOT/tests
     if [ "$suite_path" = "@all" ] || [ -z "$suite_path" ]; then
-        # Check for local tests directory first
+        # Check for local tests directory first - expand to absolute path and verify it has test suites
         if [ -d "./tests" ]; then
-            suite_path="./tests"
+            # Expand to absolute path
+            local expanded_tests="$(cd "./tests" && pwd)"
+            # Check if it has any test suites
+            local has_suites=$(tc_discover_suites_recursive "$expanded_tests" 2>/dev/null | wc -l)
+            if [ "$has_suites" -gt 0 ]; then
+                suite_path="$expanded_tests"
+            elif [ "$no_args_given" = true ]; then
+                # ./tests exists but is empty, and no args given - show helpful message
+                tc_error "no tests directory found (./tests exists but is empty)"
+                echo "" >&2
+                echo "To get started:" >&2
+                echo "  tc init              # initialize test directory" >&2
+                echo "  tc new my-test       # create your first test" >&2
+                echo "" >&2
+                echo "Or run 'tc --help' for more options" >&2
+                exit 1
+            else
+                # ./tests exists but is empty, @all was explicit - fallback to tc framework tests
+                suite_path="$TC_ROOT/tests"
+            fi
         elif [ "$no_args_given" = true ]; then
             # No args given and no local tests - show helpful message
             tc_error "no tests directory found"
@@ -133,7 +152,8 @@ tc_run_command() {
         local group_name="${suite_path#@}"
         tc_info "running test group: @$group_name"
         if [ -d "./tests" ]; then
-            suite_path="./tests"
+            # Expand to absolute path
+            suite_path="$(cd "./tests" && pwd)"
         else
             suite_path="$TC_ROOT/tests"
         fi
@@ -142,15 +162,31 @@ tc_run_command() {
     elif [[ ! "$suite_path" =~ ^[./] ]]; then
         # Relative path - check if it exists as-is first, then try ./tests/, then $TC_ROOT/tests/
         if [ -e "$suite_path" ]; then
-            # Path exists from current directory - use as-is
-            suite_path="$suite_path"
+            # Path exists from current directory - expand to absolute path
+            if [ -d "$suite_path" ]; then
+                suite_path="$(cd "$suite_path" && pwd)"
+            else
+                suite_path="$(cd "$(dirname "$suite_path")" && pwd)/$(basename "$suite_path")"
+            fi
         elif [ -e "./tests/$suite_path" ]; then
-            suite_path="./tests/$suite_path"
+            # Expand relative path through ./tests/
+            if [ -d "./tests/$suite_path" ]; then
+                suite_path="$(cd "./tests/$suite_path" && pwd)"
+            else
+                suite_path="$(cd "./tests/$(dirname "$suite_path")" && pwd)/$(basename "$suite_path")"
+            fi
         else
             suite_path="$TC_ROOT/tests/$suite_path"
         fi
+    elif [[ "$suite_path" =~ ^\. ]]; then
+        # Path starts with . - expand to absolute path
+        if [ -d "$suite_path" ]; then
+            suite_path="$(cd "$suite_path" && pwd)"
+        elif [ -e "$suite_path" ]; then
+            suite_path="$(cd "$(dirname "$suite_path")" && pwd)/$(basename "$suite_path")"
+        fi
     fi
-    # else: absolute path (starts with . or /) - use as-is
+    # else: absolute path starting with / - use as-is
 
     # parse flags (only shift if we had a suite_path argument)
     [ $# -gt 0 ] && shift
