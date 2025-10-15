@@ -39,8 +39,8 @@ install tc in <2 minutes:
 git clone https://github.com/ahoward/tc
 cd tc
 
-# add to PATH (or symlink bin/tc to /usr/local/bin)
-export PATH="$PWD/bin:$PATH"
+# add to PATH (or symlink tc/bin/tc to /usr/local/bin)
+export PATH="$PWD/tc/bin:$PATH"
 
 # verify jq is installed
 which jq || echo "install jq: brew install jq / apt install jq"
@@ -237,7 +237,7 @@ sudo pacman -S jq
 ```bash
 # option 1: add to PATH
 git clone https://github.com/ahoward/tc
-export PATH="$PWD/tc/bin:$PATH"
+export PATH="$PWD/tc:$PATH"
 
 # option 2: symlink
 git clone https://github.com/ahoward/tc

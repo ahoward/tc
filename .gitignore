@@ -2,6 +2,7 @@
 **/.tc-result
 **/.tc-cache
 *.tc-tmp
+.tc-reports/
 
 # common temp files
 *.swp

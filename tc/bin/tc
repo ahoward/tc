@@ -1,0 +1,675 @@
+#!/usr/bin/env bash
+# tc - theodore calvin's testing framework 🚁
+# language-agnostic test runner inspired by the helicopter pilot himself
+
+set -e
+
+# version info
+TC_VERSION="1.0.0"
+TC_CODENAME="island hopper"
+
+# find tc root directory
+# BASH_SOURCE[0] is the path to this script (tc/bin/tc)
+# For symlinks, we need to resolve to the actual file location
+# Works for all installation methods:
+#   - Direct: ./tc/bin/tc → TC_ROOT=/path/to/repo/tc
+#   - Symlink: /usr/local/bin/tc → /repo/tc/bin/tc → TC_ROOT=/repo/tc
+#   - Copy: /usr/local/tc/bin/tc → TC_ROOT=/usr/local/tc
+SCRIPT_PATH="${BASH_SOURCE[0]}"
+# Resolve symlinks
+while [ -L "$SCRIPT_PATH" ]; do
+    SCRIPT_DIR="$(cd -P "$(dirname "$SCRIPT_PATH")" && pwd)"
+    SCRIPT_PATH="$(readlink "$SCRIPT_PATH")"
+    [[ $SCRIPT_PATH != /* ]] && SCRIPT_PATH="$SCRIPT_DIR/$SCRIPT_PATH"
+done
+# Get absolute path to the script, then get directory containing the script (bin/), then go up one level to tc/
+SCRIPT_DIR="$(cd -P "$(dirname "$SCRIPT_PATH")" && pwd)"
+TC_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
+
+# source global configuration
+source "$TC_ROOT/config/defaults.sh"
+
+# source library modules
+source "$TC_ROOT/lib/utils/log.sh"
+source "$TC_ROOT/lib/utils/json.sh"
+source "$TC_ROOT/lib/utils/ansi.sh"
+source "$TC_ROOT/lib/utils/status-line.sh"
+source "$TC_ROOT/lib/utils/log-writer.sh"
+source "$TC_ROOT/lib/core/discovery.sh"
+source "$TC_ROOT/lib/core/executor.sh"
+source "$TC_ROOT/lib/utils/reporter.sh"
+source "$TC_ROOT/lib/core/metadata.sh"
+source "$TC_ROOT/lib/core/generator.sh"
+source "$TC_ROOT/lib/core/parallel.sh"
+
+# show version
+show_version() {
+    echo "tc v${TC_VERSION} - ${TC_CODENAME}"
+    echo "theodore calvin's language-agnostic testing framework"
+    echo ""
+    echo "🚁 testing any language, anywhere"
+}
+
+# show help
+show_help() {
+    cat << 'EOF'
+tc - theodore calvin's testing framework 🚁
+
+usage:
+    tc [path]                   run tests (defaults to all)
+    tc @all                     run all tests (explicit)
+    tc @group                   run tagged test group (future)
+    tc <path> --all             run all suites in directory tree
+    tc <path> --parallel        run all suites in parallel
+    tc init [directory]         initialize test directory
+    tc new <test-path>          generate a new test suite
+    tc list [path]              list all test suites
+    tc tags [path]              show all available tags
+    tc explain <suite>          explain what a test suite does
+    tc --version                show version info
+    tc --help                   show this help
+
+path resolution:
+    tc                          # runs all tests in ./tests
+    tc @all                     # same as above
+    tc unit/my-test             # relative to ./tests → ./tests/unit/my-test
+    tc ./tests/unit/my-test     # absolute path (starts with . or /)
+    tc /abs/path/to/tests       # absolute path
+
+examples:
+    tc                                 # run all tests (KISS!)
+    tc @all                            # explicit: run all tests
+    tc unit/json-comparison            # run single suite (relative)
+    tc ./tests/unit/json-comparison    # run single suite (absolute)
+    tc @all --parallel                 # run all tests in parallel
+    tc @auth                           # future: run @auth tagged tests
+    tc new unit/my-feature             # generate new test
+    tc list                            # list all tests
+    tc explain unit/json-comparison    # explain a test
+
+made with ☕ and helicopters
+EOF
+}
+
+# run command - execute test suite(s)
+tc_run_command() {
+    local suite_path="${1:-@all}"
+    local run_all=false
+    local filter_tags=""
+    local parallel_jobs=""
+    local no_args_given=false
+
+    # Track if no arguments were given (for better error messages)
+    if [ -z "$1" ]; then
+        no_args_given=true
+    fi
+
+    # Smart path resolution (KISS)
+    # 1. @all or empty → run all tests (check ./tests first, then $TC_ROOT/tests)
+    # 2. @group → future: run tagged group (e.g., @auth)
+    # 3. Paths starting with . or / → absolute, use as-is
+    # 4. Other paths → relative to ./tests or $TC_ROOT/tests
+    if [ "$suite_path" = "@all" ] || [ -z "$suite_path" ]; then
+        # Check for local tests directory first - expand to absolute path and verify it has test suites
+        if [ -d "./tests" ]; then
+            # Expand to absolute path
+            local expanded_tests="$(cd "./tests" && pwd)"
+            # Check if it has any test suites
+            local has_suites=$(tc_discover_suites_recursive "$expanded_tests" 2>/dev/null | wc -l)
+            if [ "$has_suites" -gt 0 ]; then
+                suite_path="$expanded_tests"
+            else
+                # ./tests exists but is empty - try TC_ROOT/tests
+                local tc_suites=$(tc_discover_suites_recursive "$TC_ROOT/tests" 2>/dev/null | wc -l)
+                if [ "$tc_suites" -gt 0 ]; then
+                    suite_path="$TC_ROOT/tests"
+                elif [ "$no_args_given" = true ]; then
+                    # No tests found anywhere
+                    tc_error "no tests directory found (./tests exists but is empty)"
+                    echo "" >&2
+                    echo "To get started:" >&2
+                    echo "  tc init              # initialize test directory" >&2
+                    echo "  tc new my-test       # create your first test" >&2
+                    echo "" >&2
+                    echo "Or run 'tc --help' for more options" >&2
+                    exit 1
+                else
+                    suite_path="$TC_ROOT/tests"
+                fi
+            fi
+        elif [ "$no_args_given" = true ]; then
+            # No ./tests directory - try TC_ROOT/tests
+            local tc_suites=$(tc_discover_suites_recursive "$TC_ROOT/tests" 2>/dev/null | wc -l)
+            if [ "$tc_suites" -gt 0 ]; then
+                suite_path="$TC_ROOT/tests"
+            else
+                # No tests found anywhere - show helpful message
+                tc_error "no tests directory found"
+                echo "" >&2
+                echo "To get started:" >&2
+                echo "  tc init              # initialize test directory" >&2
+                echo "  tc new my-test       # create your first test" >&2
+                echo "" >&2
+                echo "Or run 'tc --help' for more options" >&2
+                exit 1
+            fi
+        else
+            # Fallback to tc framework tests (for examples/development)
+            suite_path="$TC_ROOT/tests"
+        fi
+        run_all=true
+    elif [[ "$suite_path" =~ ^@ ]]; then
+        # Future: @group support (e.g., @auth, @integration)
+        local group_name="${suite_path#@}"
+        tc_info "running test group: @$group_name"
+        if [ -d "./tests" ]; then
+            # Expand to absolute path
+            suite_path="$(cd "./tests" && pwd)"
+        else
+            suite_path="$TC_ROOT/tests"
+        fi
+        filter_tags="$group_name"
+        run_all=true
+    elif [[ ! "$suite_path" =~ ^[./] ]]; then
+        # Relative path - check if it exists as-is first, then try ./tests/, then $TC_ROOT/tests/
+        if [ -e "$suite_path" ]; then
+            # Path exists from current directory - expand to absolute path
+            if [ -d "$suite_path" ]; then
+                suite_path="$(cd "$suite_path" && pwd)"
+            else
+                suite_path="$(cd "$(dirname "$suite_path")" && pwd)/$(basename "$suite_path")"
+            fi
+        elif [ -e "./tests/$suite_path" ]; then
+            # Expand relative path through ./tests/
+            if [ -d "./tests/$suite_path" ]; then
+                suite_path="$(cd "./tests/$suite_path" && pwd)"
+            else
+                suite_path="$(cd "./tests/$(dirname "$suite_path")" && pwd)/$(basename "$suite_path")"
+            fi
+        else
+            suite_path="$TC_ROOT/tests/$suite_path"
+        fi
+    elif [[ "$suite_path" =~ ^\. ]]; then
+        # Path starts with . - expand to absolute path
+        if [ -d "$suite_path" ]; then
+            suite_path="$(cd "$suite_path" && pwd)"
+        elif [ -e "$suite_path" ]; then
+            suite_path="$(cd "$(dirname "$suite_path")" && pwd)/$(basename "$suite_path")"
+        fi
+    fi
+    # else: absolute path starting with / - use as-is
+
+    # parse flags (only shift if we had a suite_path argument)
+    [ $# -gt 0 ] && shift
+    while [ $# -gt 0 ]; do
+        case "$1" in
+            --all)
+                run_all=true
+                shift
+                ;;
+            --tags)
+                filter_tags="$2"
+                run_all=true  # tags implies discovering all suites
+                shift 2
+                ;;
+            --parallel)
+                if [ -n "$2" ] && ! [[ "$2" =~ ^- ]]; then
+                    parallel_jobs="$2"
+                    shift 2
+                else
+                    parallel_jobs="auto"
+                    shift
+                fi
+                ;;
+            *)
+                tc_error "unknown flag: $1"
+                exit 1
+                ;;
+        esac
+    done
+
+    # check if jq is available
+    if ! tc_check_jq; then
+        exit 1
+    fi
+
+    # Initialize fancy output (status line) early to suppress INFO logging
+    tc_status_init
+
+    # check if path exists
+    if [ ! -e "$suite_path" ]; then
+        tc_error "path not found: $suite_path"
+        exit 1
+    fi
+
+    # if path is a directory (not a single suite), enable run_all mode
+    if [ -d "$suite_path" ] && ! tc_is_test_suite "$suite_path"; then
+        run_all=true
+    fi
+
+    # run all suites in directory tree
+    if [ "$run_all" = true ]; then
+        # use parallel execution if requested or beneficial
+        if [ -n "$parallel_jobs" ]; then
+            tc_run_suites_parallel "$suite_path" "$parallel_jobs" "$filter_tags"
+            exit $?
+        else
+            tc_run_all_suites "$suite_path" "$filter_tags"
+            exit $?
+        fi
+    fi
+
+    # check if it's a test suite
+    if tc_is_test_suite "$suite_path"; then
+        tc_info "running suite: $suite_path"
+
+        # execute suite (disable errexit temporarily to capture exit code)
+        set +e
+        local result=$(tc_execute_suite "$suite_path")
+        local exit_code=$?
+        set -e
+
+        # parse results (format: passed|failed|errors:::result_line1\nresult_line2\n...)
+        local metadata="${result%%:::*}"
+        local rest="${result#*:::}"
+
+        IFS='|' read -r passed failed errors <<< "$metadata"
+
+        # extract result details
+        local results=()
+        while IFS= read -r line; do
+            [ -n "$line" ] && results+=("$line")
+        done <<< "$rest"
+
+        # Finalize status line
+        tc_status_finish "$passed" "$failed" "$errors"
+
+        # report results
+        tc_report_suite "$suite_path" "$passed" "$failed" "$errors" "${results[@]}"
+
+        # write results to file
+        tc_write_results "$suite_path" "${results[@]}"
+
+        # exit with appropriate code
+        exit $exit_code
+    else
+        tc_error "not a test suite: $suite_path"
+        tc_error "test suites must have an executable 'run' file"
+        exit 1
+    fi
+}
+
+# run all test suites in directory tree
+tc_run_all_suites() {
+    local root_path="$1"
+    local filter_tags="${2:-}"
+
+    tc_info "discovering test suites in: $root_path"
+
+    # discover all suites
+    local all_suites=$(tc_discover_suites_recursive "$root_path")
+
+    # filter by tags if specified
+    if [ -n "$filter_tags" ]; then
+        tc_info "filtering by tags: $filter_tags"
+        local suites=""
+        while read -r suite_dir; do
+            [ -z "$suite_dir" ] && continue
+            if tc_suite_has_tag "$suite_dir" "$filter_tags"; then
+                suites="$suites$suite_dir"$'\n'
+            fi
+        done <<< "$all_suites"
+    else
+        suites="$all_suites"
+    fi
+
+    local suite_count=$(echo "$suites" | grep -c . || echo 0)
+
+    if [ -z "$suites" ]; then
+        tc_error "no test suites found in: $root_path"
+        exit 1
+    fi
+
+    tc_info "found $suite_count suite(s)"
+
+    # Only print blank line in non-TTY mode
+    [ "$TC_STATUS_MODE" != "tty" ] && echo ""
+
+    # aggregate results
+    local total_passed=0
+    local total_failed=0
+    local total_errors=0
+    local overall_exit=0
+
+    # run each suite
+    while read -r suite_dir; do
+        [ -z "$suite_dir" ] && continue
+
+        local suite_name=$(tc_suite_relative_path "$suite_dir" "$root_path")
+        tc_info "running: $suite_name"
+
+        # execute suite (use temp file to capture result and preserve exit code)
+        local temp_result=$(mktemp)
+        set +e
+        tc_execute_suite "$suite_dir" > "$temp_result"
+        local exit_code=$?
+        set -e
+
+        # read results from temp file
+        local result=$(cat "$temp_result")
+        rm -f "$temp_result"
+
+        # parse results
+        local metadata="${result%%:::*}"
+        local rest="${result#*:::}"
+        IFS='|' read -r passed failed errors <<< "$metadata"
+
+        # extract result details
+        local results=()
+        while IFS= read -r line; do
+            [ -n "$line" ] && results+=("$line")
+        done <<< "$rest"
+
+        # report suite results
+        tc_report_suite "$suite_dir" "$passed" "$failed" "$errors" "${results[@]}"
+
+        # write results to file
+        tc_write_results "$suite_dir" "${results[@]}"
+
+        # aggregate
+        total_passed=$((total_passed + passed))
+        total_failed=$((total_failed + failed))
+        total_errors=$((total_errors + errors))
+
+        if [ $exit_code -ne 0 ]; then
+            overall_exit=1
+
+            # Fail-fast in TTY mode: stop on first failure
+            if [ "$TC_STATUS_MODE" = "tty" ]; then
+                tc_status_finish "$total_passed" "$total_failed" "$total_errors"
+                return 1
+            fi
+        fi
+
+        # Only print blank line in non-TTY mode
+        [ "$TC_STATUS_MODE" != "tty" ] && echo ""
+    done <<< "$suites"
+
+    # Finalize status line after all suites complete
+    tc_status_finish "$total_passed" "$total_failed" "$total_errors"
+
+    # In non-TTY mode, print overall summary
+    if [ "$TC_STATUS_MODE" != "tty" ]; then
+        echo "===================================="
+        echo "overall results"
+        echo "===================================="
+        echo ""
+        echo "suites run: $suite_count"
+        tc_report_summary "$total_passed" "$total_failed" "$total_errors"
+        echo ""
+    fi
+
+    return $overall_exit
+}
+
+# list test suites with metadata
+tc_list_command() {
+    local root_path="${1:-.}"
+
+    # discover all suites
+    local suites=$(tc_discover_suites_recursive "$root_path")
+
+    echo "Test Suites:"
+    echo ""
+
+    while read -r suite_dir; do
+        [ -z "$suite_dir" ] && continue
+
+        local suite_name=$(tc_suite_relative_path "$suite_dir" "$root_path")
+        local tags=$(tc_get_suite_tags "$suite_dir")
+        local desc=$(tc_get_suite_description "$suite_dir")
+
+        printf "  %-30s" "$suite_name"
+        if [ -n "$tags" ]; then
+            printf " [%s]" "$tags"
+        fi
+        echo ""
+        if [ -n "$desc" ]; then
+            echo "    $desc"
+            echo ""
+        fi
+    done <<< "$suites"
+}
+
+# show all available tags
+tc_tags_command() {
+    local root_path="${1:-.}"
+
+    echo "Available tags:"
+    echo ""
+
+    tc_list_all_tags "$root_path" | while read -r tag; do
+        echo "  $tag"
+    done
+
+    echo ""
+}
+
+# explain a test suite
+tc_explain_command() {
+    local suite_path="$1"
+
+    if [ -z "$suite_path" ]; then
+        tc_error "usage: tc explain <suite-path>"
+        exit 1
+    fi
+
+    if [ ! -d "$suite_path" ]; then
+        tc_error "suite not found: $suite_path"
+        exit 1
+    fi
+
+    tc_explain_suite "$suite_path"
+}
+
+# init command - initialize test directory
+tc_init_command() {
+    local target_dir="${1:-tests}"
+
+    tc_init_directory "$target_dir"
+    exit $?
+}
+
+# T034: list examples command
+tc_list_examples_command() {
+    # T035: source templates.sh
+    source "$TC_ROOT/lib/core/templates.sh"
+    tc_list_templates
+    exit 0
+}
+
+# T025/T026/T033/T038: new command - generate test suite with optional flags
+tc_new_command() {
+    local test_path=""
+    local template_name="default"
+    local force_overwrite=false
+
+    # T033: check for --list-examples first
+    if [ "$1" = "--list-examples" ]; then
+        tc_list_examples_command
+    fi
+
+    # T025: parse optional flags
+    # reset global variables
+    unset TC_GEN_TAGS TC_GEN_PRIORITY TC_GEN_DESCRIPTION TC_GEN_DEPENDS
+
+    # parse arguments
+    while [ $# -gt 0 ]; do
+        case "$1" in
+            --tags)
+                TC_GEN_TAGS="$2"
+                shift 2
+                ;;
+            --priority)
+                TC_GEN_PRIORITY="$2"
+                shift 2
+                ;;
+            --description)
+                TC_GEN_DESCRIPTION="$2"
+                shift 2
+                ;;
+            --depends)
+                TC_GEN_DEPENDS="$2"
+                shift 2
+                ;;
+            --from)
+                # T033: template selection
+                template_name="$2"
+                shift 2
+                ;;
+            --force)
+                # T038: force overwrite existing directories
+                force_overwrite=true
+                shift
+                ;;
+            --list-examples)
+                # handled above
+                tc_list_examples_command
+                ;;
+            --help)
+                # T026: show help for new command
+                cat << 'EOF'
+tc new - generate test suite scaffolding
+
+usage:
+    tc new <test-path> [options]
+    tc new --list-examples
+
+options:
+    --from <template>        use specific template (default: "default")
+    --tags <tag1,tag2>       comma-separated tags (e.g., "auth,api")
+    --priority <level>       priority: high, medium (default), low
+    --description <text>     test description
+    --depends <paths>        space-separated dependency paths
+    --force                  overwrite existing test directory
+    --list-examples          show available templates
+    --help                   show this help
+
+examples:
+    tc new tests/my-feature
+    tc new tests/auth/login --tags "auth,api" --priority high
+    tc new tests/checkout --description "Test checkout flow" --depends "tests/cart tests/auth"
+    tc new tests/my-calc --from hello-world
+    tc new --list-examples
+
+the generated test will fail until you implement it - that's the point! 🚁
+EOF
+                exit 0
+                ;;
+            -*)
+                tc_error "unknown flag: $1"
+                tc_error "use --help to see available options"
+                exit 1
+                ;;
+            *)
+                if [ -z "$test_path" ]; then
+                    test_path="$1"
+                else
+                    tc_error "unexpected argument: $1"
+                    exit 1
+                fi
+                shift
+                ;;
+        esac
+    done
+
+    # validate test path provided
+    if [ -z "$test_path" ]; then
+        tc_error "usage: tc new <test-path> [options]"
+        tc_error ""
+        tc_error "example: tc new tests/my-feature"
+        tc_error "use --help for more options"
+        exit 1
+    fi
+
+    # export flags for use by generator (T021 expects these)
+    export TC_GEN_TAGS TC_GEN_PRIORITY TC_GEN_DESCRIPTION TC_GEN_DEPENDS
+
+    # T020: basic error handling
+    # parse test path to get test name
+    local path_info=$(tc_parse_test_path "$test_path")
+    if [ $? -ne 0 ]; then
+        exit 1
+    fi
+
+    local test_name=$(echo "$path_info" | grep '^test_name=' | cut -d= -f2-)
+
+    # validate test name
+    if ! tc_validate_test_name "$test_name"; then
+        exit 1
+    fi
+
+    # check if path exists (T038: pass force_overwrite flag)
+    if ! tc_check_path_exists "$test_path" "$force_overwrite"; then
+        exit 1
+    fi
+
+    # create directory structure
+    if ! tc_create_directory_structure "$test_path"; then
+        exit 1
+    fi
+
+    # generate from template (T033: use selected template)
+    if ! tc_generate_from_template "$test_path" "$template_name"; then
+        tc_error "Failed to generate test suite"
+        exit 1
+    fi
+
+    # display success message
+    tc_display_success_message "$test_path"
+
+    exit 0
+}
+
+# main entry point
+main() {
+    case "${1:-}" in
+        --version|-v)
+            show_version
+            ;;
+        --help|-h|help)
+            show_help
+            ;;
+        run)
+            shift  # remove 'run' from args
+            tc_run_command "$@"
+            ;;
+        init)
+            shift  # remove 'init' from args
+            tc_init_command "$@"
+            ;;
+        new)
+            shift  # remove 'new' from args
+            tc_new_command "$@"
+            ;;
+        list)
+            shift
+            tc_list_command "$@"
+            ;;
+        tags)
+            shift
+            tc_tags_command "$@"
+            ;;
+        explain)
+            shift
+            tc_explain_command "$@"
+            ;;
+        *)
+            # Default to 'run' command - KISS!
+            # If no command given or first arg looks like a path/flag, run tests
+            tc_run_command "$@"
+            ;;
+    esac
+}
+
+main "$@"
