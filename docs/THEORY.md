@@ -125,7 +125,7 @@ tests/user/create/
 
 **Override: Environment Variable**
 ```bash
-TC_ADAPTERS=./adapters/rust tc run tests
+TC_ADAPTERS=./adapters/rust tc tests
 ```
 
 **Rationale**:
@@ -138,7 +138,7 @@ TC_ADAPTERS=./adapters/rust tc run tests
 
 Run same test suite against multiple adapters:
 ```bash
-tc run tests --adapters ruby,go,python --compare
+tc tests --adapters ruby,go,python --compare
 ```
 
 **Output**:
@@ -270,13 +270,13 @@ func main() {
 **Run tests**:
 ```bash
 # Test Ruby implementation
-tc run tests/user/register --adapter ruby
+tc tests/user/register --adapter ruby
 
 # Test Go implementation
-tc run tests/user/register --adapter go
+tc tests/user/register --adapter go
 
 # Compare both
-tc run tests/user/register --adapters ruby,go --compare
+tc tests/user/register --adapters ruby,go --compare
 ```
 
 ## Benefits
@@ -399,7 +399,7 @@ speckit generate --lang ruby
 speckit generate --lang go
 
 # Wednesday: Run tests against both
-tc run tests --adapters ruby,go --compare
+tc tests --adapters ruby,go --compare
 
 # Thursday: Go is 10x faster, retire Ruby
 git rm -rf src/ruby

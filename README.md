@@ -64,13 +64,13 @@ which tc  # should show ./tc/bin/tc
 tc new tests/my-feature
 
 # run it (will fail with NOT_IMPLEMENTED)
-tc run tests/my-feature
+tc tests/my-feature
 
 # run the hello-world example
-tc run examples/hello-world
+tc examples/hello-world
 
 # run all tests hierarchically
-tc run tests --all
+tc tests --all
 ```
 
 ## what is tc?
@@ -86,12 +86,12 @@ tc is a dead-simple testing framework that lets you:
 tc has a unique self-referential property: it knows the difference between running its own tests and running your tests.
 
 **in the TC development repo:**
-- `tc run examples --all` → runs example tests only
-- `tc run tc/tests --all` → runs TC's framework self-tests
+- `tc examples --all` → runs example tests only
+- `tc tc/tests --all` → runs TC's framework self-tests
 - `tc list .` → shows examples (not tc/tests)
 
 **when installed in your project:**
-- `tc run tests --all` → runs your project's tests
+- `tc tests --all` → runs your project's tests
 - tc's self-tests (`tc/tests/`) are included in the installation but invisible to discovery
 - the same binary behaves contextually based on what it finds
 
@@ -132,13 +132,13 @@ tc is evolving beyond language-agnostic testing toward **language-portable testi
 ```bash
 # test execution
 tc                          # run all tests (KISS!)
-tc run <suite-path>         # run single test suite
-tc run <path> --all         # run all suites in directory tree
-tc run <path> --tags TAG    # run suites matching tag
-tc run <path> --parallel    # run all suites in parallel (auto CPU detection)
-tc run <path> --parallel N  # run with N parallel workers
+tc <suite-path>             # run single test suite
+tc <path> --all             # run all suites in directory tree
+tc <path> --tags TAG        # run suites matching tag
+tc <path> --parallel        # run all suites in parallel (auto CPU detection)
+tc <path> --parallel N      # run with N parallel workers
 
-# test generation (new!)
+# test generation
 tc new <test-path>          # generate new test suite
 tc init [directory]         # initialize test directory with README
 
@@ -203,7 +203,7 @@ my-feature/
 ```
 
 ```bash
-tc run my-feature  # ✓ pass or ✗ fail
+tc my-feature  # ✓ pass or ✗ fail
 ```
 
 ## features
