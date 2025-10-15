@@ -17,6 +17,7 @@ TC_TESTS_TOTAL=0
 TC_ANIMATION_FRAME=0
 TC_STATUS_LABEL="RUNNING"
 TC_TERMINAL_WIDTH=80
+TC_START_TIME=""               # Start time in seconds since epoch
 
 # Animation frames (T029)
 TC_SPINNER_FRAMES=('⠋' '⠙' '⠹' '⠸' '⠼' '⠴' '⠦' '⠧' '⠇' '⠏')
@@ -87,6 +88,9 @@ tc_status_init() {
     TC_ANIMATION_FRAME=0
     TC_STATUS_LABEL="RUNNING"
     TC_TERMINAL_WIDTH=$(tc_terminal_width)
+
+    # Record start time
+    TC_START_TIME=$(date +%s)
 
     # Suppress INFO logging in TTY mode (show only status line + errors)
     if [ "$TC_STATUS_MODE" = "tty" ]; then
@@ -173,6 +177,12 @@ tc_status_update() {
     # Format: emoji : COLOR_LABEL : suite/test : animation
     local status_line="${emoji} : ${status_label} : ${suite}/${test}${animation}"
 
+    # In TTY mode, append log path on failure
+    if [ "$TC_STATUS_MODE" = "tty" ] && [ "$TC_STATUS_LABEL" = "FAILED" ]; then
+        local log_path=$(tc_log_get_path 2>/dev/null || echo ".tc-reports/report.jsonl")
+        status_line="${status_line} - see ${log_path}"
+    fi
+
     # T032: Truncate if status line too long for terminal
     local max_width=$(tc_terminal_width)
     # Account for ANSI codes (they don't take visual space but add characters)
@@ -190,26 +200,25 @@ tc_status_update() {
         status_line="${emoji} : ${status_label} : ${truncated_path}${animation}"
     fi
 
-    # Output based on mode (send to stderr to not interfere with result data)
+    # Output only in TTY mode (send to stderr to not interfere with result data)
     if [ "$TC_STATUS_MODE" = "tty" ]; then
         # TTY mode: clear line, rewrite in place
         printf '\r\033[2K%s' "$status_line" >&2
-    else
-        # Non-TTY mode: output new line
-        printf '%s\n' "$status_line" >&2
     fi
+    # Non-TTY mode: no output (tc_progress handles this)
 
     return 0
 }
 
-# tc_status_finish(passed, failed)
+# tc_status_finish(passed, failed, errors)
 #
 # Finalize status line and print summary.
-# Shows cursor if TTY, clears status line, prints final report.
+# Shows cursor if TTY, clears status line, prints final stats.
 #
 # Args:
 #   $1: Total tests passed
 #   $2: Total tests failed
+#   $3: Total tests with errors (optional, defaults to 0)
 #
 # Returns:
 #   Outputs final summary to stdout
@@ -217,16 +226,48 @@ tc_status_update() {
 tc_status_finish() {
     local passed="$1"
     local failed="$2"
-    local total=$((passed + failed))
+    local errors="${3:-0}"
+    local total=$((passed + failed + errors))
 
-    # Show cursor in TTY mode (output to stderr)
+    # In TTY mode: show cursor, clear line, print stats summary
     if [ "$TC_STATUS_MODE" = "tty" ]; then
         tc_ansi_show_cursor >&2
-        # Clear the status line
+        # Clear the current status line
         printf '\r\033[2K' >&2
+
+        # Calculate duration
+        local end_time=$(date +%s)
+        local duration=$((end_time - TC_START_TIME))
+        local duration_str="${duration}s"
+        if [ "$duration" -ge 60 ]; then
+            local minutes=$((duration / 60))
+            local seconds=$((duration % 60))
+            duration_str="${minutes}m${seconds}s"
+        fi
+
+        # Format stats line with colors (always use colors in TTY mode)
+        local emoji="🚁"
+        local green="$(tc_ansi_color green)"
+        local red="$(tc_ansi_color red)"
+        local yellow="$(tc_ansi_color yellow)"
+        local reset="$(tc_ansi_color reset)"
+
+        local stats="${green}${passed} passed${reset}"
+        if [ "$failed" -gt 0 ]; then
+            stats="${stats}, ${red}${failed} failed${reset}"
+        fi
+        if [ "$errors" -gt 0 ]; then
+            stats="${stats}, ${yellow}${errors} errors${reset}"
+        fi
+
+        # Print final stats line
+        printf '%s : %s - %s\n' "$emoji" "$stats" "$duration_str" >&2
+
+        # Return exit code
+        return $([ "$failed" -eq 0 ] && [ "$errors" -eq 0 ] && echo 0 || echo 1)
     fi
 
-    # Print final summary (output to stderr to not interfere with result data)
+    # Non-TTY mode: Print summary (output to stderr to not interfere with result data)
     printf '\n' >&2
     printf 'Tests complete:\n' >&2
     printf '  Passed: %d\n' "$passed" >&2

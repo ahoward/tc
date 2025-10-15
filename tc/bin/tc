@@ -263,9 +263,11 @@ tc_run_command() {
     if tc_is_test_suite "$suite_path"; then
         tc_info "running suite: $suite_path"
 
-        # execute suite
+        # execute suite (disable errexit temporarily to capture exit code)
+        set +e
         local result=$(tc_execute_suite "$suite_path")
         local exit_code=$?
+        set -e
 
         # parse results (format: passed|failed|errors:::result_line1\nresult_line2\n...)
         local metadata="${result%%:::*}"
@@ -280,7 +282,7 @@ tc_run_command() {
         done <<< "$rest"
 
         # Finalize status line
-        tc_status_finish "$passed" "$failed"
+        tc_status_finish "$passed" "$failed" "$errors"
 
         # report results
         tc_report_suite "$suite_path" "$passed" "$failed" "$errors" "${results[@]}"
@@ -329,7 +331,9 @@ tc_run_all_suites() {
     fi
 
     tc_info "found $suite_count suite(s)"
-    echo ""
+
+    # Only print blank line in non-TTY mode
+    [ "$TC_STATUS_MODE" != "tty" ] && echo ""
 
     # aggregate results
     local total_passed=0
@@ -344,9 +348,16 @@ tc_run_all_suites() {
         local suite_name=$(tc_suite_relative_path "$suite_dir" "$root_path")
         tc_info "running: $suite_name"
 
-        # execute suite
-        local result=$(tc_execute_suite "$suite_dir")
+        # execute suite (use temp file to capture result and preserve exit code)
+        local temp_result=$(mktemp)
+        set +e
+        tc_execute_suite "$suite_dir" > "$temp_result"
         local exit_code=$?
+        set -e
+
+        # read results from temp file
+        local result=$(cat "$temp_result")
+        rm -f "$temp_result"
 
         # parse results
         local metadata="${result%%:::*}"
@@ -372,22 +383,31 @@ tc_run_all_suites() {
 
         if [ $exit_code -ne 0 ]; then
             overall_exit=1
+
+            # Fail-fast in TTY mode: stop on first failure
+            if [ "$TC_STATUS_MODE" = "tty" ]; then
+                tc_status_finish "$total_passed" "$total_failed" "$total_errors"
+                return 1
+            fi
         fi
 
-        echo ""
+        # Only print blank line in non-TTY mode
+        [ "$TC_STATUS_MODE" != "tty" ] && echo ""
     done <<< "$suites"
 
     # Finalize status line after all suites complete
-    tc_status_finish "$total_passed" "$total_failed"
+    tc_status_finish "$total_passed" "$total_failed" "$total_errors"
 
-    # print overall summary
-    echo "===================================="
-    echo "overall results"
-    echo "===================================="
-    echo ""
-    echo "suites run: $suite_count"
-    tc_report_summary "$total_passed" "$total_failed" "$total_errors"
-    echo ""
+    # In non-TTY mode, print overall summary
+    if [ "$TC_STATUS_MODE" != "tty" ]; then
+        echo "===================================="
+        echo "overall results"
+        echo "===================================="
+        echo ""
+        echo "suites run: $suite_count"
+        tc_report_summary "$total_passed" "$total_failed" "$total_errors"
+        echo ""
+    fi
 
     return $overall_exit
 }

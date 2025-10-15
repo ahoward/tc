@@ -13,17 +13,16 @@ tc_report_suite() {
     shift 4
     local results=("$@")
 
+    # T021: In TTY mode, skip all output (status line already showed everything)
+    if [ "$TC_STATUS_MODE" = "tty" ]; then
+        return 0
+    fi
+
     local suite_name=$(basename "$suite_path")
     local total=$((passed + failed + errors))
 
-    # T021: Check if status line is active (TTY mode with fancy output)
-    # If status line is active, skip individual test lines (already shown)
-    local skip_details=false
-    if [ "$TC_STATUS_MODE" = "tty" ]; then
-        skip_details=true
-    fi
-
-    if [ "$skip_details" = false ]; then
+    # Non-TTY mode: show detailed results
+    if true; then
         echo ""
         echo "tc test results"
         echo "================"
@@ -71,9 +70,9 @@ tc_report_summary() {
     local total=$((passed + failed + errors))
 
     if [ "$failed" -eq 0 ] && [ "$errors" -eq 0 ]; then
-        echo "${TC_COLOR_PASS}✓${TC_COLOR_RESET} all $total tests passed"
+        echo -e "${TC_COLOR_PASS}✓${TC_COLOR_RESET} all $total tests passed"
     else
-        echo "${TC_COLOR_FAIL}✗${TC_COLOR_RESET} $passed passed, $failed failed, $errors errors ($total total)"
+        echo -e "${TC_COLOR_FAIL}✗${TC_COLOR_RESET} $passed passed, $failed failed, $errors errors ($total total)"
     fi
 }
 
@@ -92,6 +91,12 @@ tc_write_results() {
 
         # create json line
         local timestamp=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+
+        # Ensure duration is a valid number (default to 0 if empty/invalid)
+        if ! [[ "$duration" =~ ^[0-9]+$ ]]; then
+            duration=0
+        fi
+
         local json=$(jq -n \
             --arg suite "$(basename "$suite_dir")" \
             --arg scenario "$scenario" \

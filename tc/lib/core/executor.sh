@@ -77,6 +77,11 @@ tc_execute_suite() {
             tc_status_update "$suite_name" "$scenario_name" "failed" "$passed" "$((failed + errors))"
             # Write to log (T054, T055)
             tc_log_write "$suite_dir" "$scenario_name" "error" "0" "validation failed"
+
+            # Fail-fast in TTY mode: stop immediately on first failure
+            if [ "$TC_STATUS_MODE" = "tty" ]; then
+                break
+            fi
             continue
         fi
 
@@ -90,6 +95,11 @@ tc_execute_suite() {
             tc_status_update "$suite_name" "$scenario_name" "failed" "$passed" "$((failed + errors))"
             # Write to log (T054, T055)
             tc_log_write "$suite_dir" "$scenario_name" "error" "0" "runner failed"
+
+            # Fail-fast in TTY mode: stop immediately on first failure
+            if [ "$TC_STATUS_MODE" = "tty" ]; then
+                break
+            fi
             continue
         fi
 
@@ -107,6 +117,11 @@ tc_execute_suite() {
             tc_status_update "$suite_name" "$scenario_name" "failed" "$passed" "$((failed + errors))"
             # Write to log (T054, T055)
             tc_log_write "$suite_dir" "$scenario_name" "error" "$duration" "timeout after ${timeout}s"
+
+            # Fail-fast in TTY mode: stop immediately on first failure
+            if [ "$TC_STATUS_MODE" = "tty" ]; then
+                break
+            fi
             continue
         elif [ "$exit_code" -ne 0 ]; then
             [ "$TC_STATUS_MODE" != "tty" ] && tc_progress_fail
@@ -118,6 +133,11 @@ tc_execute_suite() {
             tc_status_update "$suite_name" "$scenario_name" "failed" "$passed" "$((failed + errors))"
             # Write to log (T054, T055)
             tc_log_write "$suite_dir" "$scenario_name" "error" "$duration" "exit code $exit_code"
+
+            # Fail-fast in TTY mode: stop immediately on first failure
+            if [ "$TC_STATUS_MODE" = "tty" ]; then
+                break
+            fi
             continue
         fi
 
@@ -145,6 +165,14 @@ tc_execute_suite() {
             tc_status_update "$suite_name" "$scenario_name" "failed" "$passed" "$failed"
             # Write to log with error (T054, T055)
             tc_log_write "$suite_dir" "$scenario_name" "fail" "$duration" "$diff"
+
+            # Fail-fast in TTY mode: stop immediately on first failure
+            if [ "$TC_STATUS_MODE" = "tty" ]; then
+                # cleanup before breaking
+                rm -f "$actual_output"
+                tc_cleanup_runner_output "$output_file" "$stderr_file"
+                break
+            fi
         fi
 
         # cleanup

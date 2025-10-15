@@ -110,6 +110,7 @@ this means you can vendor TC into your project, and it naturally adapts to run y
 
 ```bash
 # test execution
+tc                          # run all tests (KISS!)
 tc run <suite-path>         # run single test suite
 tc run <path> --all         # run all suites in directory tree
 tc run <path> --tags TAG    # run suites matching tag
@@ -128,6 +129,41 @@ tc explain <suite>          # explain what a test suite does
 # info
 tc --version                # show version
 tc --help                   # show help
+```
+
+## output modes
+
+**tty mode (interactive terminal):**
+
+When running in a terminal, `tc` provides a clean single-line status display:
+
+```
+🚁 : RUNNING : suite/test ⠋
+```
+
+- Single line updates in place (no scrolling)
+- Helicopter emoji 🚁 with animated spinner
+- Color-coded status: green (PASSED), red (FAILED), yellow (RUNNING)
+- Fail-fast: stops immediately on first failure
+- Final stats line: `🚁 : 5 passed, 1 failed - 2m30s`
+
+**non-tty mode (ci/cd, piped output):**
+
+When output is redirected or piped, `tc` provides verbose traditional output:
+
+```
+[2025-10-14 21:00:00] INFO: running: my-suite
+  ✓ scenario-1 (123ms)
+  ✗ scenario-2 (456ms)
+    diff: ...
+summary: 1 passed, 1 failed, 0 errors
+```
+
+**override detection:**
+
+```bash
+TC_FANCY_OUTPUT=true tc    # force TTY mode
+TC_FANCY_OUTPUT=false tc   # force non-TTY mode
 ```
 
 ## documentation
@@ -159,8 +195,11 @@ tc run my-feature  # ✓ pass or ✗ fail
 - [x] hierarchical test discovery (--all flag)
 - [x] tag-based filtering (--tags flag)
 - [x] parallel execution (--parallel flag, auto-detect CPU cores)
-- [x] fancy animated output (TTY-aware with colors, emoji, spinner)
-- [x] machine-readable logs (JSONL format for analysis)
+- [x] single-line animated status (TTY mode: helicopter 🚁, spinner, colors)
+- [x] fail-fast on first error (TTY mode stops immediately, shows log path)
+- [x] final stats summary (colored counts: passed/failed/errors, cumulative time)
+- [x] traditional verbose output (non-TTY mode for CI/CD)
+- [x] machine-readable logs (JSONL format in `.tc-reports/report.jsonl`)
 
 **test generation:**
 - [x] scaffold generation (`tc new`)
