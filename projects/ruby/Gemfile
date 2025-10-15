@@ -1,0 +1,6 @@
+# frozen_string_literal: true
+
+source 'https://rubygems.org'
+
+# No external dependencies - using standard library only!
+# JSON and SecureRandom are built-in
