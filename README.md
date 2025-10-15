@@ -106,6 +106,27 @@ this means you can vendor TC into your project, and it naturally adapts to run y
 - **spec-driven**: in the AI age, the dream of language-agnostic development is real - treat your src/ as a build artifact, specs as the source of truth
 - **old-school, new-school**: built with timeless unix tools (tmux, shell, text) for a future where implementation languages are fluid
 
+## 🔬 experimental: system adapter pattern (WIP)
+
+tc is evolving beyond language-agnostic testing toward **language-portable testing** through the System Adapter Pattern.
+
+**Vision**: Enable "disposable applications" - freely swap implementation languages while preserving test suites.
+
+**Core concept**: A brutally consistent interface (`sys.call(operation, params) => result`) that lets you:
+- Write tests once at the operation level (not implementation level)
+- Run same test suite against Ruby, Go, Python, Rust, Node.js implementations
+- Compare correctness and performance across implementations
+- Change languages/frameworks without changing tests
+
+**Why this matters**: In the age of AI-generated code and spec-driven development with tools like [spec-kit](https://github.com/github/spec-kit), **specifications are the source of truth**. Implementations should be disposable. Tests should outlive any single codebase.
+
+**Status**: Early research and design. See **[docs/THEORY.md](docs/THEORY.md)** for complete methodology and vision.
+
+**Related work**:
+- [Hexagonal Architecture](https://alistair.cockburn.us/hexagonal-architecture/) (Ports & Adapters)
+- [spec-kit](https://github.com/github/spec-kit) - Markdown-driven system generation
+- tc's existing language-agnostic test runner contract
+
 ## commands
 
 ```bash
@@ -168,7 +189,7 @@ TC_FANCY_OUTPUT=false tc   # force non-TTY mode
 
 ## documentation
 
-**[→ full docs](docs/readme.md)** | **[→ tc new guide](docs/tc-new.md)**
+**[→ full docs](docs/readme.md)** | **[→ tc new guide](docs/tc-new.md)** | **[→ system adapter theory](docs/THEORY.md)** *(WIP)*
 
 ## example
 
