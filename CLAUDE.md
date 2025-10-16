@@ -11,6 +11,8 @@ Auto-generated from all feature plans. Last updated: 2025-10-11
 - Bash 4.0+ (POSIX-compatible shell scripting) + Existing TC framework, jq (already required), standard POSIX tools (test, printf, tput) (004-heli-cool-stdout)
 - JSONL files (`.tc-reports/report.jsonl`) (004-heli-cool-stdout)
 - In-memory only (maps/hashes with correlation UUID keys) (006-i-want-to)
+- Bash 4.0+ (POSIX-compatible shell scripting) + jq (JSON processing), standard POSIX tools (test, chmod, source) (007-description-add-lifecycle)
+- Filesystem-based (hook scripts in test suite directories, .tc-env files for hook state) (007-description-add-lifecycle)
 
 ## Project Structure
 ```
@@ -25,9 +27,9 @@ tests/
 Shell script (POSIX-compatible) for core framework, any language for test runners: Follow standard conventions
 
 ## Recent Changes
+- 007-description-add-lifecycle: Added Bash 4.0+ (POSIX-compatible shell scripting) + jq (JSON processing), standard POSIX tools (test, chmod, source)
 - 006-i-want-to: Added In-memory only (maps/hashes with correlation UUID keys)
 - 004-heli-cool-stdout: Added Bash 4.0+ (POSIX-compatible shell scripting) + Existing TC framework, jq (already required), standard POSIX tools (test, printf, tput)
-- 003-refactor-tc-source: Added Bash 4.0+ (POSIX-compatible shell scripting) + jq (JSON processing), standard POSIX tools (sh, basename, dirname, find, grep, etc.)
 
 <!-- MANUAL ADDITIONS START -->
 <!-- MANUAL ADDITIONS END -->
