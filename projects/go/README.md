@@ -15,7 +15,7 @@ Multi-language DAO demo - Go implementation using standard library patterns.
 
 ```bash
 # Build adapter
-go build -o adapter ./adapter
+go build -o adapter ./cmd
 
 # Run adapter
 echo '{"operation": "/prompt/generate", "params": {"text": "hello"}}' | ./adapter
@@ -32,7 +32,8 @@ tc .
 dao/         # DAO interface implementation
 operations/  # Operation handlers
 store/       # Result storage
-adapter/     # tc adapter binary
+cmd/         # tc adapter source (main.go)
+adapter      # tc adapter binary (built)
 ```
 
 ## Operations
