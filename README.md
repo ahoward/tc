@@ -129,7 +129,7 @@ tc is evolving beyond language-agnostic testing toward **language-portable testi
 
 ### 🎯 Demonstration: Multi-Language DAO System
 
-**Working example in this repo**: `projects/` + `tests/multi-lang-dao/`
+**Working example in this repo**: `projects/` + `examples/multi-lang-dao/`
 
 **What it demonstrates**: Identical DAO interface across 5 languages, all passing the same test suite.
 
@@ -149,12 +149,12 @@ tc is evolving beyond language-agnostic testing toward **language-portable testi
 /result/poll       - Async result retrieval
 ```
 
-**Test suite**: `tests/multi-lang-dao/` (5 operations, all languages pass)
+**Test suite**: `examples/multi-lang-dao/` (5 operations, validated via manual-test.sh)
 
 **Run demo**:
 ```bash
 # Test all languages
-cd tests/multi-lang-dao
+cd examples/multi-lang-dao
 ./test-all-languages.sh
 
 # Test single language
@@ -163,6 +163,8 @@ cd tests/multi-lang-dao
 ./manual-test.sh ../../projects/python/adapter.py
 ./manual-test.sh ../../projects/javascript/adapter.js
 ```
+
+**Note**: Uses `manual-test.sh` for validation because tc doesn't support UUID pattern matching yet.
 
 **See**: `specs/006-i-want-to/quickstart.md` for complete guide
 
@@ -207,7 +209,7 @@ When running in a terminal, `tc` provides a clean single-line status display:
 - Helicopter emoji 🚁 with animated spinner
 - Color-coded status: green (PASSED), red (FAILED), yellow (RUNNING)
 - Fail-fast: stops immediately on first failure
-- Final stats line: `🚁 : 5 passed, 1 failed - 2m30s`
+- Final stats line: `🚁 : 0 passed, 1 failed - 0s (failed: suite/test)`
 
 **non-tty mode (ci/cd, piped output):**
 
