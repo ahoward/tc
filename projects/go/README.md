@@ -21,7 +21,7 @@ go build -o adapter ./cmd
 echo '{"operation": "/prompt/generate", "params": {"text": "hello"}}' | ./adapter
 
 # Run with tc test suite
-cd ../../tests/multi-lang-dao
+cd ../../examples/multi-lang-dao
 ln -sf ../../projects/go/adapter run
 tc .
 ```

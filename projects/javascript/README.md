@@ -21,7 +21,7 @@ npm install
 echo '{"operation": "/prompt/generate", "params": {"text": "hello"}}' | ./adapter.js
 
 # Run with tc test suite
-cd ../../tests/multi-lang-dao
+cd ../../examples/multi-lang-dao
 ln -sf ../../projects/javascript/adapter.js run
 tc .
 ```

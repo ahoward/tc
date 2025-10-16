@@ -142,7 +142,7 @@ All languages implement identical operations:
 
 ## Test Suite
 
-**Location**: `tests/multi-lang-dao/`
+**Location**: `examples/multi-lang-dao/`
 
 **Structure**:
 ```

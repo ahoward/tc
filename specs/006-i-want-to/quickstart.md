@@ -32,7 +32,7 @@ echo '{"operation": "/prompt/generate", "params": {"text": "hello"}}' | ./tc_ada
 
 ### Run Tests
 ```bash
-cd ../../tests/multi-lang-dao
+cd ../../examples/multi-lang-dao
 ln -sf ../../projects/ruby/tc_adapter.rb run
 tc .
 ```
@@ -59,7 +59,7 @@ echo '{"operation": "/prompt/generate", "params": {"text": "hello"}}' | ./adapte
 
 ### Run Tests
 ```bash
-cd ../../tests/multi-lang-dao
+cd ../../examples/multi-lang-dao
 ln -sf ../../projects/go/adapter run
 tc .
 ```
@@ -81,7 +81,7 @@ echo '{"operation": "/prompt/generate", "params": {"text": "hello"}}' | ./target
 
 ### Run Tests
 ```bash
-cd ../../tests/multi-lang-dao
+cd ../../examples/multi-lang-dao
 ln -sf ../../projects/rust/target/release/adapter run
 tc .
 ```
@@ -103,7 +103,7 @@ echo '{"operation": "/prompt/generate", "params": {"text": "hello"}}' | ./adapte
 
 ### Run Tests
 ```bash
-cd ../../tests/multi-lang-dao
+cd ../../examples/multi-lang-dao
 ln -sf ../../projects/javascript/adapter.js run
 tc .
 ```
@@ -125,7 +125,7 @@ echo '{"operation": "/prompt/generate", "params": {"text": "hello"}}' | ./adapte
 
 ### Run Tests
 ```bash
-cd ../../tests/multi-lang-dao
+cd ../../examples/multi-lang-dao
 ln -sf ../../projects/python/adapter.py run
 tc .
 ```
@@ -136,7 +136,7 @@ tc .
 
 ### Run Against Single Language
 ```bash
-cd tests/multi-lang-dao
+cd examples/multi-lang-dao
 
 # Ruby
 ln -sf ../../projects/ruby/tc_adapter.rb run
@@ -151,7 +151,7 @@ tc .
 
 ### Compare All Languages (Future Feature)
 ```bash
-cd tests/multi-lang-dao
+cd examples/multi-lang-dao
 tc . --adapters ruby,go,rust,javascript,python --compare
 ```
 
@@ -159,7 +159,7 @@ tc . --adapters ruby,go,rust,javascript,python --compare
 ```
 🚁 Comparison Report
 
-Suite: tests/multi-lang-dao
+Suite: examples/multi-lang-dao
 ┌────────────┬────────┬────────┬──────────┐
 │ Adapter    │ Passed │ Failed │ Avg Time │
 ├────────────┼────────┼────────┼──────────┤
@@ -249,7 +249,7 @@ Suite: tests/multi-lang-dao
 ## Test Suite Structure
 
 ```
-tests/multi-lang-dao/
+examples/multi-lang-dao/
 ├── README.md
 ├── data/
 │   ├── prompt-generate/
@@ -330,11 +330,11 @@ This is expected! UUIDs are random. Tests use pattern matching:
 ### Adding a New Operation
 
 1. **Update contracts**: Add operation spec to `specs/006-i-want-to/contracts/dao-api.md`
-2. **Create tests**: Add test scenario to `tests/multi-lang-dao/data/`
+2. **Create tests**: Add test scenario to `examples/multi-lang-dao/data/`
 3. **Implement in Ruby** (showcase clean code):
    - Add handler to `lib/operations.rb`
    - Update routing in `lib/dao.rb`
-4. **Verify Ruby tests pass**: `tc tests/multi-lang-dao` (with Ruby adapter)
+4. **Verify Ruby tests pass**: `tc examples/multi-lang-dao` (with Ruby adapter)
 5. **Port to other languages**: Go, Rust, JavaScript, Python
 6. **Verify all tests pass**: Test each language separately
 7. **Run comparison**: Validate identical behavior across all

@@ -21,7 +21,7 @@ cargo build --release
 echo '{"operation": "/prompt/generate", "params": {"text": "hello"}}' | ./target/release/adapter
 
 # Run with tc test suite
-cd ../../tests/multi-lang-dao
+cd ../../examples/multi-lang-dao
 ln -sf ../../projects/rust/target/release/adapter run
 tc .
 ```

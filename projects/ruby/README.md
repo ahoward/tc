@@ -18,7 +18,7 @@ Multi-language DAO demo - Ruby implementation showcasing clean, expressive code.
 echo '{"operation": "/prompt/generate", "params": {"text": "hello"}}' | ./tc_adapter.rb
 
 # Run with tc test suite
-cd ../../tests/multi-lang-dao
+cd ../../examples/multi-lang-dao
 ln -sf ../../projects/ruby/tc_adapter.rb run
 tc .
 ```

@@ -14,7 +14,7 @@
 
 ## Path Conventions
 Multiple standalone projects: `projects/{ruby,go,rust,javascript,python}/`
-Shared test suite: `tests/multi-lang-dao/`
+Shared test suite: `examples/multi-lang-dao/`
 
 ---
 
@@ -27,7 +27,7 @@ Shared test suite: `tests/multi-lang-dao/`
 - [x] T003 [P] [SHARED] Create `projects/rust/` directory structure (src/, Cargo.toml, README.md)
 - [x] T004 [P] [SHARED] Create `projects/javascript/` directory structure (lib/, package.json, README.md)
 - [x] T005 [P] [SHARED] Create `projects/python/` directory structure (dao/, operations/, README.md)
-- [x] T006 [SHARED] Create `tests/multi-lang-dao/` directory structure (data/{prompt-generate,template-create,template-render,usage-track,result-poll}/, README.md)
+- [x] T006 [SHARED] Create `examples/multi-lang-dao/` directory structure (data/{prompt-generate,template-create,template-render,usage-track,result-poll}/, README.md)
 
 ---
 
@@ -37,12 +37,12 @@ Shared test suite: `tests/multi-lang-dao/`
 
 **⚠️ CRITICAL**: No language-specific work can begin until this phase is complete
 
-- [x] T007 [SHARED] Define tc test suite structure in `tests/multi-lang-dao/README.md` (test scenarios, expected format, UUID pattern matching)
-- [x] T008 [P] [SHARED] Create test data for /prompt/generate in `tests/multi-lang-dao/data/prompt-generate/{input.json, expected.json}`
-- [x] T009 [P] [SHARED] Create test data for /template/create in `tests/multi-lang-dao/data/template-create/{input.json, expected.json}`
-- [x] T010 [P] [SHARED] Create test data for /template/render in `tests/multi-lang-dao/data/template-render/{input.json, expected.json}`
-- [x] T011 [P] [SHARED] Create test data for /usage/track in `tests/multi-lang-dao/data/usage-track/{input.json, expected.json}`
-- [x] T012 [P] [SHARED] Create test data for /result/poll in `tests/multi-lang-dao/data/result-poll/{input.json, expected.json}`
+- [x] T007 [SHARED] Define tc test suite structure in `examples/multi-lang-dao/README.md` (test scenarios, expected format, UUID pattern matching)
+- [x] T008 [P] [SHARED] Create test data for /prompt/generate in `examples/multi-lang-dao/data/prompt-generate/{input.json, expected.json}`
+- [x] T009 [P] [SHARED] Create test data for /template/create in `examples/multi-lang-dao/data/template-create/{input.json, expected.json}`
+- [x] T010 [P] [SHARED] Create test data for /template/render in `examples/multi-lang-dao/data/template-render/{input.json, expected.json}`
+- [x] T011 [P] [SHARED] Create test data for /usage/track in `examples/multi-lang-dao/data/usage-track/{input.json, expected.json}`
+- [x] T012 [P] [SHARED] Create test data for /result/poll in `examples/multi-lang-dao/data/result-poll/{input.json, expected.json}`
 
 **Checkpoint**: Foundation ready - language implementations can now begin in parallel
 
@@ -56,7 +56,7 @@ Shared test suite: `tests/multi-lang-dao/`
 
 ### Tests for User Story 1 (tc test suite validation)
 
-- [x] T013 [US1] Verify tc test suite runs (placeholder adapter) in `tests/multi-lang-dao/run`
+- [x] T013 [US1] Verify tc test suite runs (placeholder adapter) in `examples/multi-lang-dao/run`
 
 ### Ruby Implementation for User Story 1 (Priority: Clean Code Showcase!)
 
@@ -66,7 +66,7 @@ Shared test suite: `tests/multi-lang-dao/`
 - [x] T017 [US1] Integrate /prompt/generate with DAO routing in `projects/ruby/lib/dao.rb`
 - [x] T018 [US1] Create tc adapter in `projects/ruby/tc_adapter.rb` (#!/usr/bin/env ruby, stdin/stdout JSON)
 - [x] T019 [US1] Make tc adapter executable (`chmod +x projects/ruby/tc_adapter.rb`)
-- [x] T020 [US1] Test Ruby implementation against tc suite (symlink `tests/multi-lang-dao/run` → `../../projects/ruby/tc_adapter.rb`, run `tc tests/multi-lang-dao`)
+- [x] T020 [US1] Test Ruby implementation against tc suite (symlink `examples/multi-lang-dao/run` → `../../projects/ruby/tc_adapter.rb`, run `tc examples/multi-lang-dao`)
 
 ### Go Implementation for User Story 1
 
@@ -154,8 +154,8 @@ Shared test suite: `tests/multi-lang-dao/`
 
 ### Implementation for User Story 3
 
-- [ ] T066 [US3] Document adapter switching process in `tests/multi-lang-dao/README.md` (symlink examples for each language)
-- [ ] T067 [P] [US3] Create test runner script `tests/multi-lang-dao/test-all-languages.sh` (runs tc against all 5 languages sequentially)
+- [ ] T066 [US3] Document adapter switching process in `examples/multi-lang-dao/README.md` (symlink examples for each language)
+- [ ] T067 [P] [US3] Create test runner script `examples/multi-lang-dao/test-all-languages.sh` (runs tc against all 5 languages sequentially)
 - [ ] T068 [US3] Run test-all-languages.sh and verify all 5 languages pass tc suite
 - [ ] T069 [US3] Document any language-specific quirks or differences found in `specs/006-i-want-to/quickstart.md`
 

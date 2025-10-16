@@ -18,7 +18,7 @@ Multi-language DAO demo - Python implementation with type hints and 🐍 theming
 echo '{"operation": "/prompt/generate", "params": {"text": "hello"}}' | ./adapter.py
 
 # Run with tc test suite
-cd ../../tests/multi-lang-dao
+cd ../../examples/multi-lang-dao
 ln -sf ../../projects/python/adapter.py run
 tc .
 ```

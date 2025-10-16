@@ -163,7 +163,7 @@ tests/
     └── run                     # Symlink to language adapter (e.g., ../../projects/ruby/tc_adapter.rb)
 ```
 
-**Structure Decision**: Multiple standalone projects (one per language) under `./projects/` directory. Each project is self-contained with its own dependencies, build system, and tc adapter. Shared tc test suite in `./tests/multi-lang-dao/` can be run against any language by changing the `run` symlink.
+**Structure Decision**: Multiple standalone projects (one per language) under `./projects/` directory. Each project is self-contained with its own dependencies, build system, and tc adapter. Shared tc test suite in `./examples/multi-lang-dao/` can be run against any language by changing the `run` symlink.
 
 **Rationale**:
 - Demonstrates language independence clearly
@@ -343,7 +343,7 @@ cd projects/python
 
 ```
 # Run tc test suite against Ruby
-cd tests/multi-lang-dao
+cd examples/multi-lang-dao
 ln -sf ../../projects/ruby/tc_adapter.rb run
 tc .
 

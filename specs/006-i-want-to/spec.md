@@ -269,7 +269,7 @@ Response: {id: "550e8400-...", status: "completed", result: {...}}
 ## Shared Test Suite
 
 ```
-tests/multi-lang-dao/
+examples/multi-lang-dao/
 ├── README.md
 ├── data/
 │   ├── prompt-generate/
