@@ -4,6 +4,8 @@
 **/.tc-env
 **/.tc-runner-pid
 **/.tc-runner-fifo
+**/.tc-teardown-done
+**/.tc-test.db
 *.tc-tmp
 .tc-reports/
 

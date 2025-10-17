@@ -375,8 +375,10 @@ tc_execute_suite_with_hooks() {
     tc_debug "Executing suite with lifecycle hooks: $suite_dir"
 
     # T016: Setup trap for guaranteed teardown
-    local teardown_executed=0
-    trap 'tc_execute_teardown_trap "$suite_dir" "$teardown_executed"' EXIT INT TERM
+    # Use a marker file to track if teardown has been executed
+    local teardown_marker="$suite_dir/.tc-teardown-done"
+    rm -f "$teardown_marker"  # Clean slate
+    trap 'tc_execute_teardown_trap "$suite_dir" "$teardown_marker"' EXIT INT TERM
 
     # Run setup hook if present
     if tc_has_hook "$suite_dir" "setup"; then
@@ -384,7 +386,7 @@ tc_execute_suite_with_hooks() {
         if ! tc_run_hook "$suite_dir" "setup"; then
             # Setup failure aborts entire suite (T012)
             tc_error "setup.sh failed - aborting suite"
-            _errors=$((errors + 1))
+            _errors=$((_errors + 1))
             _results+=("setup|error|0|setup hook failed")
             return 1
         fi
@@ -397,25 +399,81 @@ tc_execute_suite_with_hooks() {
     while read -r scenario_dir; do
         local scenario_name=$(tc_scenario_name "$scenario_dir")
         local data_dir="$scenario_dir"
+        local scenario_failed=0
 
-        # Run before_each hook if present
+        # Get suite timeout for scenario execution
+        local timeout=$(tc_get_suite_timeout "$suite_dir")
+
+        # Run before_each hook if present (T018)
         if tc_has_hook "$suite_dir" "before_each"; then
             tc_debug "Running before_each hook for: $scenario_name"
             if ! tc_run_hook "$suite_dir" "before_each" "$scenario_name" "$data_dir"; then
-                # before_each failure skips scenario (T012)
+                # before_each failure skips scenario (T012, T019)
                 tc_error "before_each.sh failed - skipping scenario: $scenario_name"
-                _errors=$((errors + 1))
+                _errors=$((_errors + 1))
                 _results+=("$scenario_name|error|0|before_each hook failed")
-                continue  # Skip to next scenario
+                scenario_failed=1
             fi
         fi
 
-        # TODO (US1, T021): Execute actual scenario here
-        # For now, this is a placeholder - full scenario execution logic
-        # will be integrated in US1 implementation
-        tc_debug "Scenario execution placeholder: $scenario_name"
+        # Execute scenario (only if before_each succeeded) (T021)
+        if [ "$scenario_failed" -eq 0 ]; then
+            # Validate scenario
+            local scenario_errors=$(tc_validate_scenario "$scenario_dir")
+            if [ $? -ne 0 ]; then
+                tc_error "scenario validation failed: $scenario_errors"
+                _errors=$((_errors + 1))
+                _results+=("$scenario_name|error|0|validation failed")
+                scenario_failed=1
+            else
+                # Run scenario
+                local runner_result=$(tc_run_scenario "$suite_dir" "$scenario_dir" "$timeout")
+                if [ $? -ne 0 ]; then
+                    _errors=$((_errors + 1))
+                    _results+=("$scenario_name|error|0|runner failed")
+                    scenario_failed=1
+                else
+                    # Parse runner output
+                    IFS='|' read -r output_file stderr_file exit_code duration <<< "$runner_result"
 
-        # Run after_each hook if present (always runs, even if scenario failed)
+                    # Check exit code
+                    if [ "$exit_code" -eq 124 ]; then
+                        tc_error "timeout after ${timeout}s"
+                        _errors=$((_errors + 1))
+                        _results+=("$scenario_name|timeout|$duration|exceeded timeout")
+                        tc_cleanup_runner_output "$output_file" "$stderr_file"
+                        scenario_failed=1
+                    elif [ "$exit_code" -ne 0 ]; then
+                        tc_error "runner exited with code $exit_code"
+                        _errors=$((_errors + 1))
+                        _results+=("$scenario_name|error|$duration|exit code $exit_code")
+                        tc_cleanup_runner_output "$output_file" "$stderr_file"
+                        scenario_failed=1
+                    else
+                        # Extract and compare output
+                        local actual_output=$(tc_extract_actual_output "$output_file")
+                        tc_compare_output "$actual_output" "$scenario_dir/expected.json" "$mode"
+                        local comparison_result=$?
+
+                        if [ "$comparison_result" -eq 0 ]; then
+                            _passed=$((_passed + 1))
+                            _results+=("$scenario_name|pass|$duration|")
+                        else
+                            _failed=$((_failed + 1))
+                            local diff=$(tc_generate_diff "$actual_output" "$scenario_dir/expected.json" | head -20)
+                            _results+=("$scenario_name|fail|$duration|$diff")
+                            scenario_failed=1
+                        fi
+
+                        # Cleanup
+                        rm -f "$actual_output"
+                        tc_cleanup_runner_output "$output_file" "$stderr_file"
+                    fi
+                fi
+            fi
+        fi
+
+        # Run after_each hook if present (always runs, even if scenario failed) (T018, T019)
         if tc_has_hook "$suite_dir" "after_each"; then
             tc_debug "Running after_each hook for: $scenario_name"
             if ! tc_run_hook "$suite_dir" "after_each" "$scenario_name" "$data_dir"; then
@@ -426,9 +484,6 @@ tc_execute_suite_with_hooks() {
 
     done <<< "$scenarios"
 
-    # Mark teardown as executed so trap doesn't run it again
-    teardown_executed=1
-
     # Run teardown hook if present (always runs)
     if tc_has_hook "$suite_dir" "teardown"; then
         tc_debug "Running teardown hook"
@@ -437,6 +492,9 @@ tc_execute_suite_with_hooks() {
             tc_warn "teardown.sh failed (continuing)"
         fi
     fi
+
+    # Mark teardown as executed so trap doesn't run it again
+    touch "$teardown_marker"
 
     # Clear trap since we've successfully run teardown
     trap - EXIT INT TERM
@@ -453,23 +511,25 @@ tc_execute_suite_with_hooks() {
 # Guaranteed Teardown (T016)
 # ============================================================================
 
-# tc_execute_teardown_trap(suite_dir, already_executed)
+# tc_execute_teardown_trap(suite_dir, teardown_marker)
 #
 # Trap handler to ensure teardown runs even on early exit
 #
 # Args:
 #   $1: Suite directory
-#   $2: Flag indicating if teardown already ran (1=yes, 0=no)
+#   $2: Path to teardown marker file
 tc_execute_teardown_trap() {
     local suite_dir="$1"
-    local already_executed="$2"
+    local teardown_marker="$2"
 
     # Only run teardown if it hasn't already been executed
-    if [ "$already_executed" -eq 0 ]; then
+    if [ ! -f "$teardown_marker" ]; then
         if tc_has_hook "$suite_dir" "teardown"; then
             tc_debug "Running teardown via trap (emergency cleanup)"
             tc_run_hook "$suite_dir" "teardown" || true  # Never fail in trap
         fi
+        # Mark as done even if it failed (don't retry)
+        touch "$teardown_marker" 2>/dev/null || true
     fi
 }
 

@@ -57,13 +57,21 @@ tc_execute_suite() {
     # T015: Detect if suite has lifecycle hooks and delegate if present
     if tc_is_stateful_suite "$suite_dir"; then
         tc_debug "Suite has lifecycle hooks - delegating to hook-aware executor"
-        # Delegate to hook-aware execution (TODO: US1 implementation)
-        # For now, fall through to standard execution
-        # tc_execute_suite_with_hooks "$suite_dir" "$mode" passed failed errors results
-        tc_debug "Hook execution not yet implemented - using standard mode"
+
+        # Delegate to hook-aware execution (US1: T017-T021)
+        tc_execute_suite_with_hooks "$suite_dir" "$mode" passed failed errors results
+        local suite_exit_code=$?
+
+        # Don't finalize status line here - let the caller handle it
+
+        # Return results (use ::: as separator between metadata and result lines)
+        echo -n "$passed|$failed|$errors:::"
+        printf "%s\n" "${results[@]}"
+
+        return $suite_exit_code
     fi
 
-    # execute each scenario
+    # execute each scenario (stateless mode - no hooks)
     while read -r scenario_dir; do
         local scenario_name=$(tc_scenario_name "$scenario_dir")
 
