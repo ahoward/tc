@@ -341,3 +341,135 @@ tc_is_stateful_suite() {
     tc_has_hook "$suite_dir" "setup"
 }
 
+# ============================================================================
+# Hook Execution State Machine (T014)
+# ============================================================================
+
+# tc_execute_suite_with_hooks(suite_dir, mode, passed, failed, errors, results)
+#
+# Execute test suite with lifecycle hooks
+# Orchestrates: setup → (before_each → scenario → after_each)* → teardown
+#
+# Args:
+#   $1: Suite directory (absolute path)
+#   $2: Comparison mode
+#   $3: Variable name for passed count (will be updated)
+#   $4: Variable name for failed count (will be updated)
+#   $5: Variable name for error count (will be updated)
+#   $6: Variable name for results array (will be updated)
+#
+# Returns:
+#   0 if all tests passed
+#   1 if any failures/errors
+#
+# Note: This is the skeleton/orchestration function. Detailed implementation
+#       of hook integration points will be completed in US1 (T017-T040).
+tc_execute_suite_with_hooks() {
+    local suite_dir="$1"
+    local mode="$2"
+    local -n _passed=$3
+    local -n _failed=$4
+    local -n _errors=$5
+    local -n _results=$6
+
+    tc_debug "Executing suite with lifecycle hooks: $suite_dir"
+
+    # T016: Setup trap for guaranteed teardown
+    local teardown_executed=0
+    trap 'tc_execute_teardown_trap "$suite_dir" "$teardown_executed"' EXIT INT TERM
+
+    # Run setup hook if present
+    if tc_has_hook "$suite_dir" "setup"; then
+        tc_debug "Running setup hook"
+        if ! tc_run_hook "$suite_dir" "setup"; then
+            # Setup failure aborts entire suite (T012)
+            tc_error "setup.sh failed - aborting suite"
+            _errors=$((errors + 1))
+            _results+=("setup|error|0|setup hook failed")
+            return 1
+        fi
+    fi
+
+    # Find all scenarios (same as stateless mode)
+    local scenarios=$(tc_find_scenarios "$suite_dir")
+
+    # Execute each scenario with before_each/after_each hooks
+    while read -r scenario_dir; do
+        local scenario_name=$(tc_scenario_name "$scenario_dir")
+        local data_dir="$scenario_dir"
+
+        # Run before_each hook if present
+        if tc_has_hook "$suite_dir" "before_each"; then
+            tc_debug "Running before_each hook for: $scenario_name"
+            if ! tc_run_hook "$suite_dir" "before_each" "$scenario_name" "$data_dir"; then
+                # before_each failure skips scenario (T012)
+                tc_error "before_each.sh failed - skipping scenario: $scenario_name"
+                _errors=$((errors + 1))
+                _results+=("$scenario_name|error|0|before_each hook failed")
+                continue  # Skip to next scenario
+            fi
+        fi
+
+        # TODO (US1, T021): Execute actual scenario here
+        # For now, this is a placeholder - full scenario execution logic
+        # will be integrated in US1 implementation
+        tc_debug "Scenario execution placeholder: $scenario_name"
+
+        # Run after_each hook if present (always runs, even if scenario failed)
+        if tc_has_hook "$suite_dir" "after_each"; then
+            tc_debug "Running after_each hook for: $scenario_name"
+            if ! tc_run_hook "$suite_dir" "after_each" "$scenario_name" "$data_dir"; then
+                # after_each failure is logged but doesn't fail scenario (T012)
+                tc_warn "after_each.sh failed for scenario: $scenario_name (continuing)"
+            fi
+        fi
+
+    done <<< "$scenarios"
+
+    # Mark teardown as executed so trap doesn't run it again
+    teardown_executed=1
+
+    # Run teardown hook if present (always runs)
+    if tc_has_hook "$suite_dir" "teardown"; then
+        tc_debug "Running teardown hook"
+        if ! tc_run_hook "$suite_dir" "teardown"; then
+            # teardown failure is logged but doesn't fail suite (T012)
+            tc_warn "teardown.sh failed (continuing)"
+        fi
+    fi
+
+    # Clear trap since we've successfully run teardown
+    trap - EXIT INT TERM
+
+    # Return success/failure based on scenario results
+    if [ "$_failed" -gt 0 ] || [ "$_errors" -gt 0 ]; then
+        return 1
+    else
+        return 0
+    fi
+}
+
+# ============================================================================
+# Guaranteed Teardown (T016)
+# ============================================================================
+
+# tc_execute_teardown_trap(suite_dir, already_executed)
+#
+# Trap handler to ensure teardown runs even on early exit
+#
+# Args:
+#   $1: Suite directory
+#   $2: Flag indicating if teardown already ran (1=yes, 0=no)
+tc_execute_teardown_trap() {
+    local suite_dir="$1"
+    local already_executed="$2"
+
+    # Only run teardown if it hasn't already been executed
+    if [ "$already_executed" -eq 0 ]; then
+        if tc_has_hook "$suite_dir" "teardown"; then
+            tc_debug "Running teardown via trap (emergency cleanup)"
+            tc_run_hook "$suite_dir" "teardown" || true  # Never fail in trap
+        fi
+    fi
+}
+
