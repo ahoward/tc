@@ -260,16 +260,21 @@ tc_status_finish() {
             stats="${stats}, ${yellow}${errors} errors${reset}"
         fi
 
-        # Print final stats line with failed test info if applicable
+        # Get log file path for display
+        local log_path=$(tc_log_get_path 2>/dev/null || echo ".tc-reports/report.jsonl")
+        local cyan="$(tc_ansi_color cyan)"
+        local log_info="${cyan}logs: ${log_path}${reset}"
+
+        # Print final stats line with failed test info and log location
         if [ "$failed" -gt 0 ] || [ "$errors" -gt 0 ]; then
             # Show which test failed (fail-fast stops on first failure)
             if [ -n "$TC_CURRENT_SUITE" ] && [ -n "$TC_CURRENT_TEST" ]; then
-                printf '%s : %s - %s (failed: %s/%s)\n' "$emoji" "$stats" "$duration_str" "$TC_CURRENT_SUITE" "$TC_CURRENT_TEST" >&2
+                printf '%s : %s - %s (failed: %s/%s) - %s\n' "$emoji" "$stats" "$duration_str" "$TC_CURRENT_SUITE" "$TC_CURRENT_TEST" "$log_info" >&2
             else
-                printf '%s : %s - %s\n' "$emoji" "$stats" "$duration_str" >&2
+                printf '%s : %s - %s - %s\n' "$emoji" "$stats" "$duration_str" "$log_info" >&2
             fi
         else
-            printf '%s : %s - %s\n' "$emoji" "$stats" "$duration_str" >&2
+            printf '%s : %s - %s - %s\n' "$emoji" "$stats" "$duration_str" "$log_info" >&2
         fi
 
         # Return exit code
@@ -277,11 +282,14 @@ tc_status_finish() {
     fi
 
     # Non-TTY mode: Print summary (output to stderr to not interfere with result data)
+    local log_path=$(tc_log_get_path 2>/dev/null || echo ".tc-reports/report.jsonl")
+
     printf '\n' >&2
     printf 'Tests complete:\n' >&2
     printf '  Passed: %d\n' "$passed" >&2
     printf '  Failed: %d\n' "$failed" >&2
     printf '  Total:  %d\n' "$total" >&2
+    printf '  Logs:   %s\n' "$log_path" >&2
     printf '\n' >&2
 
     # Return exit code
