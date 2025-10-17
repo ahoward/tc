@@ -57,3 +57,8 @@ if [ ! -t 1 ]; then
     TC_COLOR_INFO=""
     TC_COLOR_RESET=""
 fi
+
+# lifecycle hooks settings (007-description-add-lifecycle feature)
+: ${TC_HOOK_TIMEOUT:=30}              # hook execution timeout (seconds)
+: ${TC_HOOKS_ENABLED:=true}           # enable/disable hooks globally
+: ${TC_RUNNER_SHUTDOWN_TIMEOUT:=5}    # stateful runner graceful shutdown timeout (seconds)

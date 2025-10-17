@@ -1,0 +1,14 @@
+[package]
+name = "dao-demo"
+version = "0.1.0"
+edition = "2021"
+
+[[bin]]
+name = "adapter"
+path = "src/bin/adapter.rs"
+
+[dependencies]
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+uuid = { version = "1.6", features = ["v4", "serde"] }
+chrono = "0.4"

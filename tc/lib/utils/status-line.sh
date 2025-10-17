@@ -260,8 +260,17 @@ tc_status_finish() {
             stats="${stats}, ${yellow}${errors} errors${reset}"
         fi
 
-        # Print final stats line
-        printf '%s : %s - %s\n' "$emoji" "$stats" "$duration_str" >&2
+        # Print final stats line with failed test info if applicable
+        if [ "$failed" -gt 0 ] || [ "$errors" -gt 0 ]; then
+            # Show which test failed (fail-fast stops on first failure)
+            if [ -n "$TC_CURRENT_SUITE" ] && [ -n "$TC_CURRENT_TEST" ]; then
+                printf '%s : %s - %s (failed: %s/%s)\n' "$emoji" "$stats" "$duration_str" "$TC_CURRENT_SUITE" "$TC_CURRENT_TEST" >&2
+            else
+                printf '%s : %s - %s\n' "$emoji" "$stats" "$duration_str" >&2
+            fi
+        else
+            printf '%s : %s - %s\n' "$emoji" "$stats" "$duration_str" >&2
+        fi
 
         # Return exit code
         return $([ "$failed" -eq 0 ] && [ "$errors" -eq 0 ] && echo 0 || echo 1)

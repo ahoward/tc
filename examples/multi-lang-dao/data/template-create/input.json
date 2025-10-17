@@ -1,0 +1,8 @@
+{
+  "operation": "/template/create",
+  "params": {
+    "name": "greeting",
+    "pattern": "Hello {{name}}, welcome to {{place}}!",
+    "variables": ["name", "place"]
+  }
+}

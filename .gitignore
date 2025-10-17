@@ -1,6 +1,11 @@
 # tc framework - test result files
 **/.tc-result
 **/.tc-cache
+**/.tc-env
+**/.tc-runner-pid
+**/.tc-runner-fifo
+**/.tc-teardown-done
+**/.tc-test.db
 *.tc-tmp
 .tc-reports/
 
@@ -34,3 +39,29 @@ htmlcov/
 .envrc
 .env
 .env.*
+
+# language-specific build artifacts and dependencies
+# Node.js
+node_modules/
+package-lock.json
+npm-debug.log*
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.egg-info/
+.venv/
+venv/
+*.egg
+
+# Ruby
+.bundle/
+vendor/bundle/
+
+# Go
+go.sum
+
+# Rust
+target/
+Cargo.lock

@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+# Multi-language DAO test runner
+# Adapts tc test format (input file path) to DAO adapter format (stdin JSON)
+#
+# tc passes input file path as $1
+# DAO adapters expect JSON on stdin
+
+set -e
+
+input_file="$1"
+
+# Get directory of this script
+script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+# Read input file and pipe to Ruby adapter via stdin
+cat "$input_file" | "$script_dir/../../projects/ruby/tc_adapter.rb"
