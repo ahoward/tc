@@ -1,0 +1,216 @@
+{
+  "suite": "multi-lang-dao",
+  "scenario": "prompt-generate",
+  "status": "fail",
+  "duration_ms": 132,
+  "timestamp": "2025-10-16T03:21:35Z",
+  "comparison_mode": "semantic_json"
+}
+{
+  "suite": "multi-lang-dao",
+  "scenario": "<   \"id\": \"0b8b45f9-2356-4874-96ba-6a35e614009a\",",
+  "status": "",
+  "duration_ms": 0,
+  "timestamp": "2025-10-16T03:21:35Z",
+  "comparison_mode": "semantic_json"
+}
+{
+  "suite": "multi-lang-dao",
+  "scenario": "---",
+  "status": "",
+  "duration_ms": 0,
+  "timestamp": "2025-10-16T03:21:35Z",
+  "comparison_mode": "semantic_json"
+}
+{
+  "suite": "multi-lang-dao",
+  "scenario": ">   \"id\": \"<uuid>\",",
+  "status": "",
+  "duration_ms": 0,
+  "timestamp": "2025-10-16T03:21:35Z",
+  "comparison_mode": "semantic_json"
+}
+{
+  "suite": "multi-lang-dao",
+  "scenario": "result-poll",
+  "status": "fail",
+  "duration_ms": 158,
+  "timestamp": "2025-10-16T03:21:35Z",
+  "comparison_mode": "semantic_json"
+}
+{
+  "suite": "multi-lang-dao",
+  "scenario": "<   \"error\": \"Result not found or expired: 550e8400-e29b-41d4-a716-446655440000\"",
+  "status": "",
+  "duration_ms": 0,
+  "timestamp": "2025-10-16T03:21:35Z",
+  "comparison_mode": "semantic_json"
+}
+{
+  "suite": "multi-lang-dao",
+  "scenario": "---",
+  "status": "",
+  "duration_ms": 0,
+  "timestamp": "2025-10-16T03:21:35Z",
+  "comparison_mode": "semantic_json"
+}
+{
+  "suite": "multi-lang-dao",
+  "scenario": ">   \"id\": \"550e8400-e29b-41d4-a716-446655440000\",",
+  "status": "",
+  "duration_ms": 0,
+  "timestamp": "2025-10-16T03:21:35Z",
+  "comparison_mode": "semantic_json"
+}
+{
+  "suite": "multi-lang-dao",
+  "scenario": ">   \"result\": {",
+  "status": "",
+  "duration_ms": 0,
+  "timestamp": "2025-10-16T03:21:35Z",
+  "comparison_mode": "semantic_json"
+}
+{
+  "suite": "multi-lang-dao",
+  "scenario": ">     \"processed\": \"HELLO WORLD [AI-processed]\",",
+  "status": "",
+  "duration_ms": 0,
+  "timestamp": "2025-10-16T03:21:35Z",
+  "comparison_mode": "semantic_json"
+}
+{
+  "suite": "multi-lang-dao",
+  "scenario": ">     \"text\": \"hello world\"",
+  "status": "",
+  "duration_ms": 0,
+  "timestamp": "2025-10-16T03:21:35Z",
+  "comparison_mode": "semantic_json"
+}
+{
+  "suite": "multi-lang-dao",
+  "scenario": ">   },",
+  "status": "",
+  "duration_ms": 0,
+  "timestamp": "2025-10-16T03:21:35Z",
+  "comparison_mode": "semantic_json"
+}
+{
+  "suite": "multi-lang-dao",
+  "scenario": ">   \"status\": \"completed\"",
+  "status": "",
+  "duration_ms": 0,
+  "timestamp": "2025-10-16T03:21:35Z",
+  "comparison_mode": "semantic_json"
+}
+{
+  "suite": "multi-lang-dao",
+  "scenario": "template-create",
+  "status": "fail",
+  "duration_ms": 129,
+  "timestamp": "2025-10-16T03:21:35Z",
+  "comparison_mode": "semantic_json"
+}
+{
+  "suite": "multi-lang-dao",
+  "scenario": "<   \"id\": \"c662ecde-d267-47c9-abab-e4325e087adc\",",
+  "status": "",
+  "duration_ms": 0,
+  "timestamp": "2025-10-16T03:21:35Z",
+  "comparison_mode": "semantic_json"
+}
+{
+  "suite": "multi-lang-dao",
+  "scenario": "---",
+  "status": "",
+  "duration_ms": 0,
+  "timestamp": "2025-10-16T03:21:35Z",
+  "comparison_mode": "semantic_json"
+}
+{
+  "suite": "multi-lang-dao",
+  "scenario": ">   \"id\": \"<uuid>\",",
+  "status": "",
+  "duration_ms": 0,
+  "timestamp": "2025-10-16T03:21:35Z",
+  "comparison_mode": "semantic_json"
+}
+{
+  "suite": "multi-lang-dao",
+  "scenario": "template-render",
+  "status": "fail",
+  "duration_ms": 130,
+  "timestamp": "2025-10-16T03:21:35Z",
+  "comparison_mode": "semantic_json"
+}
+{
+  "suite": "multi-lang-dao",
+  "scenario": "<   \"id\": \"28db61ec-2b83-4d36-a067-420a51ca5b45\",",
+  "status": "",
+  "duration_ms": 0,
+  "timestamp": "2025-10-16T03:21:35Z",
+  "comparison_mode": "semantic_json"
+}
+{
+  "suite": "multi-lang-dao",
+  "scenario": "---",
+  "status": "",
+  "duration_ms": 0,
+  "timestamp": "2025-10-16T03:21:35Z",
+  "comparison_mode": "semantic_json"
+}
+{
+  "suite": "multi-lang-dao",
+  "scenario": ">   \"id\": \"<uuid>\",",
+  "status": "",
+  "duration_ms": 0,
+  "timestamp": "2025-10-16T03:21:35Z",
+  "comparison_mode": "semantic_json"
+}
+{
+  "suite": "multi-lang-dao",
+  "scenario": "usage-track",
+  "status": "fail",
+  "duration_ms": 140,
+  "timestamp": "2025-10-16T03:21:35Z",
+  "comparison_mode": "semantic_json"
+}
+{
+  "suite": "multi-lang-dao",
+  "scenario": "<   \"id\": \"ebc23c88-2370-4195-b458-5409dc922367\",",
+  "status": "",
+  "duration_ms": 0,
+  "timestamp": "2025-10-16T03:21:35Z",
+  "comparison_mode": "semantic_json"
+}
+{
+  "suite": "multi-lang-dao",
+  "scenario": "---",
+  "status": "",
+  "duration_ms": 0,
+  "timestamp": "2025-10-16T03:21:35Z",
+  "comparison_mode": "semantic_json"
+}
+{
+  "suite": "multi-lang-dao",
+  "scenario": ">   \"id\": \"<uuid>\",",
+  "status": "",
+  "duration_ms": 0,
+  "timestamp": "2025-10-16T03:21:35Z",
+  "comparison_mode": "semantic_json"
+}
+{
+  "suite": "multi-lang-dao",
+  "scenario": "5d4",
+  "status": "",
+  "duration_ms": 0,
+  "timestamp": "2025-10-16T03:21:35Z",
+  "comparison_mode": "semantic_json"
+}
+{
+  "suite": "multi-lang-dao",
+  "scenario": "<     \"timestamp\": \"2025-10-16T03:21:35Z\",",
+  "status": "",
+  "duration_ms": 0,
+  "timestamp": "2025-10-16T03:21:35Z",
+  "comparison_mode": "semantic_json"
+}

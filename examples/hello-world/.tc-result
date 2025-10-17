@@ -1,0 +1,24 @@
+{
+  "suite": "hello-world",
+  "scenario": "add-negative",
+  "status": "pass",
+  "duration_ms": 22,
+  "timestamp": "2025-10-15T00:19:00Z",
+  "comparison_mode": "semantic_json"
+}
+{
+  "suite": "hello-world",
+  "scenario": "add-positive",
+  "status": "pass",
+  "duration_ms": 23,
+  "timestamp": "2025-10-15T00:19:00Z",
+  "comparison_mode": "semantic_json"
+}
+{
+  "suite": "hello-world",
+  "scenario": "add-zero",
+  "status": "pass",
+  "duration_ms": 33,
+  "timestamp": "2025-10-15T00:19:00Z",
+  "comparison_mode": "semantic_json"
+}

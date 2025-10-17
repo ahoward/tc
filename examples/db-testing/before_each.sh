@@ -3,8 +3,8 @@
 
 set -e
 
-# DB_FILE is loaded from .tc-env by tc framework
-DB_FILE="${DB_FILE:-$TC_SUITE_PATH/.tc-test.db}"
+# DB_FILE is loaded from tc-env by tc framework
+DB_FILE="${DB_FILE:-$TC_SUITE_PATH/test.db}"
 
 # Check if scenario has a seed.sql file
 SEED_FILE="$TC_DATA_DIR/seed.sql"

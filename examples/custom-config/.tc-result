@@ -1,0 +1,8 @@
+{
+  "suite": "custom-config",
+  "scenario": "test-scenario",
+  "status": "pass",
+  "duration_ms": 1012,
+  "timestamp": "2025-10-13T09:28:30Z",
+  "comparison_mode": "semantic_json"
+}

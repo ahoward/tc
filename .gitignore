@@ -1,13 +1,13 @@
-# tc framework - test result files
-**/.tc-result
-**/.tc-cache
-**/.tc-env
-**/.tc-runner-pid
-**/.tc-runner-fifo
-**/.tc-teardown-done
-**/.tc-test.db
+# tc framework - temporary and result files
+tc/tmp/
+**/tc-result
+**/tc-cache
+**/tc-env
+**/tc-runner-pid
+**/tc-runner-fifo
+**/tc-teardown-done
+**/test.db
 *.tc-tmp
-.tc-reports/
 
 # common temp files
 *.swp

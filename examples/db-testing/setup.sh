@@ -4,7 +4,7 @@
 set -e
 
 # Create a temporary test database
-DB_FILE="$TC_SUITE_PATH/.tc-test.db"
+DB_FILE="$TC_SUITE_PATH/test.db"
 
 # Remove old DB if exists
 rm -f "$DB_FILE"
@@ -28,7 +28,7 @@ CREATE TABLE posts (
 );
 EOF
 
-# Store DB path in .tc-env for other hooks to use
-echo "export DB_FILE=\"$DB_FILE\"" > "$TC_SUITE_PATH/.tc-env"
+# Store DB path in tc-env for other hooks to use
+echo "export DB_FILE=\"$DB_FILE\"" > "$TC_SUITE_PATH/tc-env"
 
 echo "Test database created: $DB_FILE" >&2

@@ -28,11 +28,11 @@
 
 # output settings
 : ${TC_OUTPUT_FORMAT:="human"}       # human, json, jsonl
-: ${TC_RESULT_FILE:=".tc-result"}    # result file name in each suite
+: ${TC_RESULT_FILE:="tc-result"}     # result file name in each suite (no dot prefix)
 
 # fancy output settings (heli-cool-stdout feature)
 : ${TC_FANCY_OUTPUT:=""}             # auto-detect TTY if empty, "true"/"false" to override
-: ${TC_REPORT_DIR:=".tc-reports"}    # directory for JSONL log files
+: ${TC_REPORT_DIR:="tc/tmp"}         # directory for JSONL log files (no dot prefix)
 : ${TC_LOG_FILE:="report.jsonl"}     # log filename within TC_REPORT_DIR
 : ${TC_NO_ANIMATION:=0}              # disable animation (0=no, 1=yes)
 : ${TC_NO_COLOR:=0}                  # disable colors (0=no, 1=yes, also respects NO_COLOR)

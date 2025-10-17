@@ -3,8 +3,8 @@
 
 set -e
 
-# DB_FILE is loaded from .tc-env by tc framework
-DB_FILE="${DB_FILE:-$TC_SUITE_PATH/.tc-test.db}"
+# DB_FILE is loaded from tc-env by tc framework
+DB_FILE="${DB_FILE:-$TC_SUITE_PATH/test.db}"
 
 # Remove test database
 if [ -f "$DB_FILE" ]; then
@@ -12,7 +12,7 @@ if [ -f "$DB_FILE" ]; then
     echo "Test database removed: $DB_FILE" >&2
 fi
 
-# Remove .tc-env file
-rm -f "$TC_SUITE_PATH/.tc-env"
+# Remove tc-env file
+rm -f "$TC_SUITE_PATH/tc-env"
 
 echo "Teardown complete" >&2

@@ -3,8 +3,8 @@
 
 set -e
 
-# DB_FILE is loaded from .tc-env by tc framework
-DB_FILE="${DB_FILE:-$TC_SUITE_PATH/.tc-test.db}"
+# DB_FILE is loaded from tc-env by tc framework
+DB_FILE="${DB_FILE:-$TC_SUITE_PATH/test.db}"
 
 # Clear all data (but keep schema)
 echo "Cleaning up data for scenario: $TC_SCENARIO" >&2

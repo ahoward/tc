@@ -135,16 +135,16 @@ tc_set_hook_env() {
 
 # tc_load_hook_env(suite_dir)
 #
-# Source .tc-env file if it exists
+# Source tc-env file if it exists
 #
 # Args:
 #   $1: Suite directory
 #
 # Returns:
-#   0 always (missing .tc-env is OK)
+#   0 always (missing tc-env is OK)
 tc_load_hook_env() {
     local suite_dir="$1"
-    local env_file="$suite_dir/.tc-env"
+    local env_file="$suite_dir/tc-env"
 
     if [ -f "$env_file" ]; then
         tc_debug "Loading hook environment from: $env_file"
@@ -152,7 +152,7 @@ tc_load_hook_env() {
         if bash -n "$env_file" 2>/dev/null; then
             source "$env_file"
         else
-            tc_error "Invalid syntax in .tc-env file: $env_file"
+            tc_error "Invalid syntax in tc-env file: $env_file"
             return 1
         fi
     fi
@@ -376,7 +376,7 @@ tc_execute_suite_with_hooks() {
 
     # T016: Setup trap for guaranteed teardown
     # Use a marker file to track if teardown has been executed
-    local teardown_marker="$suite_dir/.tc-teardown-done"
+    local teardown_marker="$suite_dir/tc-teardown-done"
     rm -f "$teardown_marker"  # Clean slate
     trap 'tc_execute_teardown_trap "$suite_dir" "$teardown_marker"' EXIT INT TERM
 

@@ -6,8 +6,8 @@ set -e
 # Get the directory where this script lives (suite directory)
 SUITE_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
-# DB_FILE is loaded from .tc-env by tc framework, or use suite-relative path
-DB_FILE="${DB_FILE:-$SUITE_DIR/.tc-test.db}"
+# DB_FILE is loaded from tc-env by tc framework, or use suite-relative path
+DB_FILE="${DB_FILE:-$SUITE_DIR/test.db}"
 
 # Read input JSON from file argument or stdin
 if [ -n "$1" ]; then

@@ -23,11 +23,11 @@ Creates a SQLite database with the schema:
 #!/usr/bin/env bash
 set -e
 
-DB_FILE="$TC_SUITE_PATH/.tc-test.db"
+DB_FILE="$TC_SUITE_PATH/test.db"
 sqlite3 "$DB_FILE" < schema.sql
 
-# Save DB path to .tc-env for other hooks
-echo "export DB_FILE=\"$DB_FILE\"" > "$TC_SUITE_PATH/.tc-env"
+# Save DB path to tc-env for other hooks
+echo "export DB_FILE=\"$DB_FILE\"" > "$TC_SUITE_PATH/tc-env"
 ```
 
 ### `teardown.sh` - Runs once after all tests
@@ -39,7 +39,7 @@ Removes the test database:
 set -e
 
 rm -f "$DB_FILE"
-rm -f "$TC_SUITE_PATH/.tc-env"
+rm -f "$TC_SUITE_PATH/tc-env"
 ```
 
 ### `before_each.sh` - Runs before each scenario
@@ -83,13 +83,13 @@ tc provides these variables to hooks:
 
 ## Sharing State Between Hooks
 
-Use `.tc-env` file to share environment variables:
+Use `tc-env` file to share environment variables:
 
 ```bash
 # In setup.sh - create and save state
-echo "export DB_FILE=\"$TC_SUITE_PATH/.tc-test.db\"" > "$TC_SUITE_PATH/.tc-env"
+echo "export DB_FILE=\"$TC_SUITE_PATH/test.db\"" > "$TC_SUITE_PATH/tc-env"
 
-# In other hooks - tc automatically sources .tc-env
+# In other hooks - tc automatically sources tc-env
 # So $DB_FILE is available
 ```
 
