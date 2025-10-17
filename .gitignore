@@ -1,6 +1,9 @@
 # tc framework - test result files
 **/.tc-result
 **/.tc-cache
+**/.tc-env
+**/.tc-runner-pid
+**/.tc-runner-fifo
 *.tc-tmp
 .tc-reports/
 
