@@ -3,6 +3,7 @@
   "status": "completed",
   "result": {
     "tracked": true,
-    "operation": "/prompt/generate"
+    "operation": "/prompt/generate",
+    "timestamp": "<timestamp>"
   }
 }
