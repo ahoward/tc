@@ -13,42 +13,53 @@ tc_report_suite() {
     shift 4
     local results=("$@")
 
+    # T021: In TTY mode, skip all output (status line already showed everything)
+    if [ "$TC_STATUS_MODE" = "tty" ]; then
+        return 0
+    fi
+
     local suite_name=$(basename "$suite_path")
     local total=$((passed + failed + errors))
 
-    echo ""
-    echo "tc test results"
-    echo "================"
-    echo "suite: $suite_name"
-    echo ""
+    # Non-TTY mode: show detailed results
+    if true; then
+        echo ""
+        echo "tc test results"
+        echo "================"
+        echo "suite: $suite_name"
+        echo ""
 
-    # show individual scenario results
-    for result_line in "${results[@]}"; do
-        IFS='|' read -r scenario status duration diff <<< "$result_line"
+        # show individual scenario results
+        for result_line in "${results[@]}"; do
+            IFS='|' read -r scenario status duration diff <<< "$result_line"
 
-        case "$status" in
-            pass)
-                echo "  ${TC_COLOR_PASS}✓${TC_COLOR_RESET} $scenario (${duration}ms)"
-                ;;
-            fail)
-                echo "  ${TC_COLOR_FAIL}✗${TC_COLOR_RESET} $scenario (${duration}ms)"
-                if [ -n "$diff" ]; then
-                    echo "    diff:"
-                    echo "$diff" | sed 's/^/      /'
-                fi
-                ;;
-            error|timeout)
-                echo "  ${TC_COLOR_FAIL}✗${TC_COLOR_RESET} $scenario [$status]"
-                if [ -n "$diff" ]; then
-                    echo "    $diff"
-                fi
-                ;;
-        esac
-    done
+            case "$status" in
+                pass)
+                    echo "  ${TC_COLOR_PASS}✓${TC_COLOR_RESET} $scenario (${duration}ms)"
+                    ;;
+                fail)
+                    echo "  ${TC_COLOR_FAIL}✗${TC_COLOR_RESET} $scenario (${duration}ms)"
+                    if [ -n "$diff" ]; then
+                        echo "    diff:"
+                        echo "$diff" | sed 's/^/      /'
+                    fi
+                    ;;
+                error|timeout)
+                    echo "  ${TC_COLOR_FAIL}✗${TC_COLOR_RESET} $scenario [$status]"
+                    if [ -n "$diff" ]; then
+                        echo "    $diff"
+                    fi
+                    ;;
+            esac
+        done
+    fi
 
-    echo ""
-    echo "summary: ${TC_COLOR_PASS}$passed passed${TC_COLOR_RESET}, ${TC_COLOR_FAIL}$failed failed${TC_COLOR_RESET}, ${TC_COLOR_WARN}$errors errors${TC_COLOR_RESET} ($total total)"
-    echo ""
+    # Always show summary (status line finish already printed it)
+    if [ "$skip_details" = false ]; then
+        echo ""
+        echo "summary: ${TC_COLOR_PASS}$passed passed${TC_COLOR_RESET}, ${TC_COLOR_FAIL}$failed failed${TC_COLOR_RESET}, ${TC_COLOR_WARN}$errors errors${TC_COLOR_RESET} ($total total)"
+        echo ""
+    fi
 }
 
 # format minimal summary
@@ -59,9 +70,9 @@ tc_report_summary() {
     local total=$((passed + failed + errors))
 
     if [ "$failed" -eq 0 ] && [ "$errors" -eq 0 ]; then
-        echo "${TC_COLOR_PASS}✓${TC_COLOR_RESET} all $total tests passed"
+        echo -e "${TC_COLOR_PASS}✓${TC_COLOR_RESET} all $total tests passed"
     else
-        echo "${TC_COLOR_FAIL}✗${TC_COLOR_RESET} $passed passed, $failed failed, $errors errors ($total total)"
+        echo -e "${TC_COLOR_FAIL}✗${TC_COLOR_RESET} $passed passed, $failed failed, $errors errors ($total total)"
     fi
 }
 
@@ -80,6 +91,12 @@ tc_write_results() {
 
         # create json line
         local timestamp=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+
+        # Ensure duration is a valid number (default to 0 if empty/invalid)
+        if ! [[ "$duration" =~ ^[0-9]+$ ]]; then
+            duration=0
+        fi
+
         local json=$(jq -n \
             --arg suite "$(basename "$suite_dir")" \
             --arg scenario "$scenario" \

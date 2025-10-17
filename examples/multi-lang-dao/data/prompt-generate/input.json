@@ -1,0 +1,6 @@
+{
+  "operation": "/prompt/generate",
+  "params": {
+    "text": "hello world"
+  }
+}

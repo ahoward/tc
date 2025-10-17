@@ -9,14 +9,13 @@ language-agnostic testing for unix hackers
 </p>
 
 ```
-       ___
-      /___\        tc v1.0.0 - island hopper
-     |  o  |       testing any language, anywhere
-    _|_____|_
-   |_________|     "the chopper's fueled up and ready to go"
-     |     |
-    / \   / \
-   🚁  island hopper
+|=o=o=o=o=o=o=o=o=o=o=o=|      tc v1.0.0 - island hopper
+           |                   testing any language, anywhere
+       ___/ \___      (o)       🚁 fly safe, test well
+     (( tc      ))======\
+       \_______/        (o)
+         ^   ^
+      ^-----------^
 ```
 
 ## ⚠️  IMPORTANT: `tc` is a Unix builtin command!
@@ -65,13 +64,13 @@ which tc  # should show ./tc/bin/tc
 tc new tests/my-feature
 
 # run it (will fail with NOT_IMPLEMENTED)
-tc run tests/my-feature
+tc tests/my-feature
 
 # run the hello-world example
-tc run examples/hello-world
+tc examples/hello-world
 
 # run all tests hierarchically
-tc run tests --all
+tc tests --all
 ```
 
 ## what is tc?
@@ -87,12 +86,12 @@ tc is a dead-simple testing framework that lets you:
 tc has a unique self-referential property: it knows the difference between running its own tests and running your tests.
 
 **in the TC development repo:**
-- `tc run examples --all` → runs example tests only
-- `tc run tc/tests --all` → runs TC's framework self-tests
+- `tc examples --all` → runs example tests only
+- `tc tc/tests --all` → runs TC's framework self-tests
 - `tc list .` → shows examples (not tc/tests)
 
 **when installed in your project:**
-- `tc run tests --all` → runs your project's tests
+- `tc tests --all` → runs your project's tests
 - tc's self-tests (`tc/tests/`) are included in the installation but invisible to discovery
 - the same binary behaves contextually based on what it finds
 
@@ -107,17 +106,82 @@ tc has a unique self-referential property: it knows the difference between runni
 - **spec-driven**: in the AI age, the dream of language-agnostic development is real - treat your src/ as a build artifact, specs as the source of truth
 - **old-school, new-school**: built with timeless unix tools (tmux, shell, text) for a future where implementation languages are fluid
 
+## 🔬 experimental: system adapter pattern (WIP)
+
+tc is evolving beyond language-agnostic testing toward **language-portable testing** through the System Adapter Pattern.
+
+**Vision**: Enable "disposable applications" - freely swap implementation languages while preserving test suites.
+
+**Core concept**: A brutally consistent interface (`sys.call(operation, params) => result`) that lets you:
+- Write tests once at the operation level (not implementation level)
+- Run same test suite against Ruby, Go, Python, Rust, Node.js implementations
+- Compare correctness and performance across implementations
+- Change languages/frameworks without changing tests
+
+**Why this matters**: In the age of AI-generated code and spec-driven development with tools like [spec-kit](https://github.com/github/spec-kit), **specifications are the source of truth**. Implementations should be disposable. Tests should outlive any single codebase.
+
+**Status**: Early research and design. See **[docs/THEORY.md](docs/THEORY.md)** for complete methodology and vision.
+
+**Related work**:
+- [Hexagonal Architecture](https://alistair.cockburn.us/hexagonal-architecture/) (Ports & Adapters)
+- [spec-kit](https://github.com/github/spec-kit) - Markdown-driven system generation
+- tc's existing language-agnostic test runner contract
+
+### 🎯 Demonstration: Multi-Language DAO System
+
+**Working example in this repo**: `projects/` + `examples/multi-lang-dao/`
+
+**What it demonstrates**: Identical DAO interface across 5 languages, all passing the same test suite.
+
+**Languages implemented**:
+- 💎 **Ruby** - Clean, idiomatic (stdlib only)
+- **Go** - Performance baseline (stdlib only)
+- 🐍 **Python** - Type-hinted, playful (stdlib only)
+- **JavaScript** - ES6 modules (uuid package)
+- 🦀 **Rust** - Memory-safe (code complete, build environment issue)
+
+**Operations** (all languages):
+```
+/prompt/generate   - Async AI prompt processing
+/template/create   - Template with variable placeholders
+/template/render   - Variable substitution
+/usage/track       - Synchronous usage tracking
+/result/poll       - Async result retrieval
+```
+
+**Test suite**: `examples/multi-lang-dao/` (5 operations, validated via manual-test.sh)
+
+**Run demo**:
+```bash
+# Test all languages
+cd examples/multi-lang-dao
+./test-all-languages.sh
+
+# Test single language
+./manual-test.sh ../../projects/ruby/tc_adapter.rb
+./manual-test.sh ../../projects/go/adapter
+./manual-test.sh ../../projects/python/adapter.py
+./manual-test.sh ../../projects/javascript/adapter.js
+```
+
+**Note**: Uses `manual-test.sh` for validation because tc doesn't support UUID pattern matching yet.
+
+**See**: `specs/006-i-want-to/quickstart.md` for complete guide
+
+**Results**: 4/5 languages fully working, identical behavior validated ✓
+
 ## commands
 
 ```bash
 # test execution
-tc run <suite-path>         # run single test suite
-tc run <path> --all         # run all suites in directory tree
-tc run <path> --tags TAG    # run suites matching tag
-tc run <path> --parallel    # run all suites in parallel (auto CPU detection)
-tc run <path> --parallel N  # run with N parallel workers
+tc                          # run all tests (KISS!)
+tc <suite-path>             # run single test suite
+tc <path> --all             # run all suites in directory tree
+tc <path> --tags TAG        # run suites matching tag
+tc <path> --parallel        # run all suites in parallel (auto CPU detection)
+tc <path> --parallel N      # run with N parallel workers
 
-# test generation (new!)
+# test generation
 tc new <test-path>          # generate new test suite
 tc init [directory]         # initialize test directory with README
 
@@ -131,9 +195,44 @@ tc --version                # show version
 tc --help                   # show help
 ```
 
+## output modes
+
+**tty mode (interactive terminal):**
+
+When running in a terminal, `tc` provides a clean single-line status display:
+
+```
+🚁 : RUNNING : suite/test ⠋
+```
+
+- Single line updates in place (no scrolling)
+- Helicopter emoji 🚁 with animated spinner
+- Color-coded status: green (PASSED), red (FAILED), yellow (RUNNING)
+- Fail-fast: stops immediately on first failure
+- Final stats line: `🚁 : 0 passed, 1 failed - 0s (failed: suite/test)`
+
+**non-tty mode (ci/cd, piped output):**
+
+When output is redirected or piped, `tc` provides verbose traditional output:
+
+```
+[2025-10-14 21:00:00] INFO: running: my-suite
+  ✓ scenario-1 (123ms)
+  ✗ scenario-2 (456ms)
+    diff: ...
+summary: 1 passed, 1 failed, 0 errors
+```
+
+**override detection:**
+
+```bash
+TC_FANCY_OUTPUT=true tc    # force TTY mode
+TC_FANCY_OUTPUT=false tc   # force non-TTY mode
+```
+
 ## documentation
 
-**[→ full docs](docs/readme.md)** | **[→ tc new guide](docs/tc-new.md)**
+**[→ full docs](docs/readme.md)** | **[→ tc new guide](docs/tc-new.md)** | **[→ system adapter theory](docs/THEORY.md)** *(WIP)*
 
 ## example
 
@@ -147,7 +246,7 @@ my-feature/
 ```
 
 ```bash
-tc run my-feature  # ✓ pass or ✗ fail
+tc my-feature  # ✓ pass or ✗ fail
 ```
 
 ## features
@@ -160,6 +259,11 @@ tc run my-feature  # ✓ pass or ✗ fail
 - [x] hierarchical test discovery (--all flag)
 - [x] tag-based filtering (--tags flag)
 - [x] parallel execution (--parallel flag, auto-detect CPU cores)
+- [x] single-line animated status (TTY mode: helicopter 🚁, spinner, colors)
+- [x] fail-fast on first error (TTY mode stops immediately, shows log path)
+- [x] final stats summary (colored counts: passed/failed/errors, cumulative time)
+- [x] traditional verbose output (non-TTY mode for CI/CD)
+- [x] machine-readable logs (JSONL format in `.tc-reports/report.jsonl`)
 
 **test generation:**
 - [x] scaffold generation (`tc new`)

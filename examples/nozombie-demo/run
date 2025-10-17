@@ -1,0 +1,61 @@
+#!/usr/bin/env bash
+# example demonstrating nozombie process management
+
+# load nozombie
+source "$(dirname "$0")/../../tc/lib/utils/nozombie.sh"
+
+# read input
+input_file="$1"
+test_case=$(jq -r '.test_case' "$input_file")
+
+case "$test_case" in
+    "spawn_and_exit")
+        # Spawn a long-running child process
+        sleep 999 &
+        child_pid=$!
+
+        # This would normally become a zombie/orphan if parent dies
+        # But nozombie ensures it gets killed
+
+        echo '{"result": "spawned_child", "child_pid": '$child_pid'}'
+        ;;
+
+    "spawn_with_tracking")
+        # Proper usage: register with nozombie
+        tc_nozombie_init $$
+
+        sleep 999 &
+        child_pid=$!
+        tc_nozombie_register "$child_pid"
+
+        echo '{"result": "tracked_child", "child_pid": '$child_pid'}'
+        ;;
+
+    "nozombie_run")
+        # Best usage: use tc_nozombie_run wrapper
+        tc_nozombie_init $$
+
+        result=$(tc_nozombie_run sleep 2)
+
+        echo '{"result": "completed", "exit_code": '$?'}'
+        ;;
+
+    "nozombie_timeout")
+        # Test timeout functionality
+        tc_nozombie_init $$
+
+        tc_nozombie_run_with_timeout 1 sleep 10
+        exit_code=$?
+
+        if [ $exit_code -eq 124 ]; then
+            echo '{"result": "timeout", "exit_code": 124}'
+        else
+            echo '{"result": "unexpected", "exit_code": '$exit_code'}'
+        fi
+        ;;
+
+    *)
+        echo '{"error": "unknown test case"}'
+        exit 1
+        ;;
+esac

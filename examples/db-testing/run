@@ -1,0 +1,38 @@
+#!/usr/bin/env bash
+# Database test runner - executes SQL from input.json and outputs results as JSON
+
+set -e
+
+# Get the directory where this script lives (suite directory)
+SUITE_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+# DB_FILE is loaded from .tc-env by tc framework, or use suite-relative path
+DB_FILE="${DB_FILE:-$SUITE_DIR/.tc-test.db}"
+
+# Read input JSON from file argument or stdin
+if [ -n "$1" ]; then
+    input=$(cat "$1")
+else
+    input=$(cat)
+fi
+
+# Extract SQL query from input
+sql=$(echo "$input" | jq -r '.sql')
+
+# Execute query and convert to JSON
+# For SELECT queries, output as JSON array
+# For INSERT/UPDATE/DELETE, output affected row count
+if echo "$sql" | grep -qiE '^\s*(SELECT|PRAGMA)'; then
+    # SELECT query - output results as JSON array
+    result=$(sqlite3 -json "$DB_FILE" "$sql")
+    echo "$result"
+else
+    # INSERT/UPDATE/DELETE - output affected rows in same session
+    result=$(sqlite3 "$DB_FILE" <<EOF
+$sql
+SELECT json_object('affected_rows', changes());
+EOF
+)
+    # Output just the JSON line (last line)
+    echo "$result" | tail -1
+fi

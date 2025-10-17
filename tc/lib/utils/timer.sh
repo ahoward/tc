@@ -85,3 +85,15 @@ tc_validate_timeout() {
 
     return 0
 }
+
+# start a timer (returns timestamp in milliseconds)
+tc_timer_start() {
+    date +%s%3N  # milliseconds since epoch
+}
+
+# stop timer and return duration in milliseconds
+tc_timer_stop() {
+    local start_time="$1"
+    local end_time=$(date +%s%3N)
+    echo $((end_time - start_time))
+}

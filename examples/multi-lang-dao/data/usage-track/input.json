@@ -1,0 +1,7 @@
+{
+  "operation": "/usage/track",
+  "params": {
+    "operation": "/prompt/generate",
+    "duration_ms": 45
+  }
+}
