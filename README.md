@@ -31,8 +31,7 @@ git clone https://github.com/ahoward/tc.git
 cd tc
 
 # IMPORTANT: Add to PATH (avoids conflict with Unix traffic control command)
-echo 'PATH_add ./tc/bin' > .envrc && direnv allow
-# OR: export PATH="$PWD/tc/bin:$PATH"
+export PATH="$PWD/tc/bin:$PATH"
 
 # verify
 tc --version
@@ -52,15 +51,12 @@ tc new tests/my-feature
 
 **`tc` conflicts with the Unix traffic control command.** You MUST add this project's `tc` to your PATH.
 
-**Recommended** (direnv):
 ```bash
-echo 'PATH_add ./tc/bin' > .envrc
-direnv allow
-```
-
-**Alternative** (manual):
-```bash
+# Add to PATH for current session
 export PATH="$PWD/tc/bin:$PATH"
+
+# Add to shell config for persistence (optional)
+echo 'export PATH="$PWD/tc/bin:$PATH"' >> ~/.bashrc  # or ~/.zshrc
 ```
 
 **Verify**:
@@ -234,22 +230,19 @@ Then use in expected.json:
 
 ## installation
 
-**Prerequisites**: bash 4.0+, jq, direnv (recommended)
+**Prerequisites**: bash 4.0+, jq
 
 ```bash
-# Install dependencies
-brew install jq direnv              # macOS
-sudo apt-get install jq direnv      # Ubuntu/Debian
-
-# Add direnv to shell
-echo 'eval "$(direnv hook bash)"' >> ~/.bashrc && source ~/.bashrc
+# Install jq
+brew install jq                     # macOS
+sudo apt-get install jq             # Ubuntu/Debian
 
 # Clone tc
 git clone https://github.com/ahoward/tc.git
 cd tc
 
-# Setup PATH (recommended: direnv)
-echo 'PATH_add ./tc/bin' > .envrc && direnv allow
+# Add to PATH
+export PATH="$PWD/tc/bin:$PATH"
 
 # Verify
 tc --version
