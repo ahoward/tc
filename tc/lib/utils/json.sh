@@ -75,29 +75,55 @@ tc_json_compare_with_patterns() {
     local actual_file="$1"
     local expected_file="$2"
 
+    # build custom patterns object for jq
+    local custom_patterns_json="{}"
+    if [ -n "$TC_CUSTOM_PATTERNS" ]; then
+        # parse custom patterns: "name:regex" format (one per line)
+        custom_patterns_json=$(echo "$TC_CUSTOM_PATTERNS" | awk -F: '
+            BEGIN { print "{" }
+            NF >= 2 {
+                name = $1
+                regex = substr($0, length($1) + 2)
+                # escape backslashes and quotes for JSON
+                gsub(/\\/, "\\\\", regex)
+                gsub(/"/, "\\\"", regex)
+                if (NR > 1) print ","
+                printf "  \"%s\": \"%s\"", name, regex
+            }
+            END { print "\n}" }
+        ')
+    fi
+
     # use jq to validate patterns recursively
     local result=$(jq --slurpfile actual "$actual_file" \
                       --slurpfile expected "$expected_file" \
+                      --argjson custom_patterns "$custom_patterns_json" \
                       -n '
         def is_pattern: type == "string" and (startswith("<") and endswith(">"));
 
         def validate($actual_val; $expected_val):
           if ($expected_val | is_pattern) then
-            # pattern matching
-            if $expected_val == "<uuid>" then
+            # extract pattern name (remove < and >)
+            ($expected_val | .[1:-1]) as $pattern_name |
+
+            # built-in pattern matching
+            if $pattern_name == "uuid" then
               $actual_val | type == "string" and test("^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$")
-            elif $expected_val == "<timestamp>" then
+            elif $pattern_name == "timestamp" then
               $actual_val | type == "string" and test("^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}")
-            elif $expected_val == "<number>" then
+            elif $pattern_name == "number" then
               $actual_val | type == "number"
-            elif $expected_val == "<string>" then
+            elif $pattern_name == "string" then
               $actual_val | type == "string"
-            elif $expected_val == "<boolean>" then
+            elif $pattern_name == "boolean" then
               $actual_val | type == "boolean"
-            elif $expected_val == "<null>" then
+            elif $pattern_name == "null" then
               $actual_val | type == "null"
-            elif $expected_val == "<any>" then
+            elif $pattern_name == "any" then
               true
+            # custom pattern matching
+            elif $custom_patterns[$pattern_name] then
+              $actual_val | type == "string" and test($custom_patterns[$pattern_name])
             else
               # unknown pattern
               false

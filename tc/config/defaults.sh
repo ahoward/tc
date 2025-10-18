@@ -62,3 +62,12 @@ fi
 : ${TC_HOOK_TIMEOUT:=30}              # hook execution timeout (seconds)
 : ${TC_HOOKS_ENABLED:=true}           # enable/disable hooks globally
 : ${TC_RUNNER_SHUTDOWN_TIMEOUT:=5}    # stateful runner graceful shutdown timeout (seconds)
+
+# pattern matching - custom patterns for JSON comparison
+# format: "pattern_name:regex" - one per line
+# built-in patterns: <uuid>, <timestamp>, <number>, <string>, <boolean>, <null>, <any>
+# example custom patterns:
+#   TC_CUSTOM_PATTERNS="email:^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$
+#   ipv4:^([0-9]{1,3}\.){3}[0-9]{1,3}$
+#   phone:^\+?[0-9]{10,15}$"
+: ${TC_CUSTOM_PATTERNS:=""}
