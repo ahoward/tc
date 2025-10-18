@@ -143,13 +143,44 @@ my-feature/
 tc my-feature  # ✓ pass or ✗ fail
 ```
 
+## pattern matching
+
+tc supports simple pattern matching in `expected.json` for dynamic values:
+
+```json
+{
+  "id": "<uuid>",
+  "status": "pending",
+  "created_at": "<timestamp>",
+  "count": "<number>",
+  "message": "<string>"
+}
+```
+
+**Patterns:**
+- `<uuid>` - validates UUID v4 format
+- `<timestamp>` - validates ISO 8601 timestamp (YYYY-MM-DDTHH:MM:SS)
+- `<number>` - any JSON number
+- `<string>` - any string value
+- `<boolean>` - true or false
+- `<null>` - null value
+- `<any>` - matches anything
+
+**Works everywhere:**
+- Nested objects
+- Array elements
+- Mixed with exact values
+
+**No configuration needed** - patterns are auto-detected.
+
 ## features
 
 **test execution:**
 - [x] run single test suite
 - [x] semantic json comparison (order-independent)
+- [x] pattern matching (`<uuid>`, `<timestamp>`, `<number>`, `<string>`, etc.)
 - [x] timeout management
-- [x] result persistence (.tc-result files)
+- [x] result persistence (tc-result files)
 - [x] hierarchical test discovery (--all flag)
 - [x] tag-based filtering (--tags flag)
 - [x] parallel execution (--parallel flag, auto-detect CPU cores)
@@ -157,7 +188,7 @@ tc my-feature  # ✓ pass or ✗ fail
 - [x] fail-fast on first error (TTY mode stops immediately, shows log path)
 - [x] final stats summary (colored counts: passed/failed/errors, cumulative time)
 - [x] traditional verbose output (non-TTY mode for CI/CD)
-- [x] machine-readable logs (JSONL format in `.tc-reports/report.jsonl`)
+- [x] machine-readable logs (JSONL format in `tc/tmp/report.jsonl`)
 
 **test generation:**
 - [x] scaffold generation (`tc new`)
