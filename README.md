@@ -173,6 +173,28 @@ tc supports simple pattern matching in `expected.json` for dynamic values:
 
 **No configuration needed** - patterns are auto-detected.
 
+### custom patterns
+
+Define your own patterns via `TC_CUSTOM_PATTERNS`:
+
+```bash
+export TC_CUSTOM_PATTERNS="email:^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$
+ipv4:^([0-9]{1,3}\.){3}[0-9]{1,3}$
+phone:^\+?[0-9]{10,15}$"
+```
+
+Then use in expected.json:
+
+```json
+{
+  "email": "<email>",
+  "server": "<ipv4>",
+  "contact": "<phone>"
+}
+```
+
+**Format**: `pattern_name:regex` (one per line, standard regex syntax)
+
 ## features
 
 **test execution:**
