@@ -1,14 +1,9 @@
 
 TODO
 ====
+- ensure streaming inputs is compatible with logs fmt/jsonl
 - world class zombie prevention via monitor
 - /slash commands
-- Run ./scripts/slack_export --hours 24
-<internal:/opt/hostedtoolcache/Ruby/3.2.9/x64/lib/ruby/3.2.0/rubygems/core_ext/kernel_require.rb>:86:in `require': cannot load such file -- parallel (LoadError)
-	from <internal:/opt/hostedtoolcache/Ruby/3.2.9/x64/lib/ruby/3.2.0/rubygems/core_ext/kernel_require.rb>:86:in `require'
-	from ./scripts/slack_export:97:in `<main>'
-Error: Process completed with exit code 1.
-- ensure streaming inputs is compatible with logs fmt/jsonl
 
 - tc init should `cd ./bin/ && ln -s ../tc/bin/tc ./` iff ./bin/ is present.  aka.  'tc init installs a symlink binstub`.  alternatively, it would write a one line binstub bash script.  most devs have ./bin/ in thier path.
 
