@@ -1,0 +1,126 @@
+{
+  "timestamp": "2025-10-13T20:20:56Z",
+  "suite_path": "/tmp/tmp.qqZ4fkBX48/suite-1",
+  "test_name": "scenario1",
+  "status": "pass",
+  "duration_ms": 8
+}
+{
+  "timestamp": "2025-10-13T20:20:56Z",
+  "suite_path": "/tmp/tmp.qqZ4fkBX48/suite-2",
+  "test_name": "scenario1",
+  "status": "pass",
+  "duration_ms": 8
+}
+{
+  "timestamp": "2025-10-13T20:20:56Z",
+  "suite_path": "/tmp/tmp.qqZ4fkBX48/suite-3",
+  "test_name": "scenario1",
+  "status": "pass",
+  "duration_ms": 8
+}
+{
+  "timestamp": "2025-10-13T20:20:56Z",
+  "suite_path": "/home/drawohara/gh/ahoward/tc/tc/tests/integration/hierarchical",
+  "test_name": "three-suites",
+  "status": "pass",
+  "duration_ms": 385
+}
+{
+  "timestamp": "2025-10-13T20:20:57Z",
+  "suite_path": "/tmp/tmp.yWy04LLzBz/test-suite",
+  "test_name": "test1",
+  "status": "pass",
+  "duration_ms": 13
+}
+{
+  "timestamp": "2025-10-13T20:20:57Z",
+  "suite_path": "/home/drawohara/gh/ahoward/tc/tc/tests/integration/single-suite",
+  "test_name": "passing-suite",
+  "status": "pass",
+  "duration_ms": 164
+}
+{
+  "timestamp": "2025-10-13T20:20:57Z",
+  "suite_path": "/home/drawohara/gh/ahoward/tc/tc/tests/unit/json-comparison",
+  "test_name": "different-values",
+  "status": "pass",
+  "duration_ms": 39
+}
+{
+  "timestamp": "2025-10-13T20:20:57Z",
+  "suite_path": "/home/drawohara/gh/ahoward/tc/tc/tests/unit/json-comparison",
+  "test_name": "exact-match",
+  "status": "pass",
+  "duration_ms": 44
+}
+{
+  "timestamp": "2025-10-13T20:20:57Z",
+  "suite_path": "/home/drawohara/gh/ahoward/tc/tc/tests/unit/json-comparison",
+  "test_name": "order-independent",
+  "status": "pass",
+  "duration_ms": 39
+}
+{
+  "timestamp": "2025-10-13T20:26:38Z",
+  "suite_path": "/tmp/tmp.QXLPlii4fc/suite-1",
+  "test_name": "scenario1",
+  "status": "pass",
+  "duration_ms": 7
+}
+{
+  "timestamp": "2025-10-13T20:26:38Z",
+  "suite_path": "/tmp/tmp.QXLPlii4fc/suite-2",
+  "test_name": "scenario1",
+  "status": "pass",
+  "duration_ms": 8
+}
+{
+  "timestamp": "2025-10-13T20:26:38Z",
+  "suite_path": "/tmp/tmp.QXLPlii4fc/suite-3",
+  "test_name": "scenario1",
+  "status": "pass",
+  "duration_ms": 8
+}
+{
+  "timestamp": "2025-10-13T20:26:38Z",
+  "suite_path": "/home/drawohara/gh/ahoward/tc/tc/tests/integration/hierarchical",
+  "test_name": "three-suites",
+  "status": "pass",
+  "duration_ms": 381
+}
+{
+  "timestamp": "2025-10-13T20:26:39Z",
+  "suite_path": "/tmp/tmp.R450OiyVJp/test-suite",
+  "test_name": "test1",
+  "status": "pass",
+  "duration_ms": 16
+}
+{
+  "timestamp": "2025-10-13T20:26:39Z",
+  "suite_path": "/home/drawohara/gh/ahoward/tc/tc/tests/integration/single-suite",
+  "test_name": "passing-suite",
+  "status": "pass",
+  "duration_ms": 174
+}
+{
+  "timestamp": "2025-10-13T20:26:39Z",
+  "suite_path": "/home/drawohara/gh/ahoward/tc/tc/tests/unit/json-comparison",
+  "test_name": "different-values",
+  "status": "pass",
+  "duration_ms": 44
+}
+{
+  "timestamp": "2025-10-13T20:26:39Z",
+  "suite_path": "/home/drawohara/gh/ahoward/tc/tc/tests/unit/json-comparison",
+  "test_name": "exact-match",
+  "status": "pass",
+  "duration_ms": 49
+}
+{
+  "timestamp": "2025-10-13T20:26:39Z",
+  "suite_path": "/home/drawohara/gh/ahoward/tc/tc/tests/unit/json-comparison",
+  "test_name": "order-independent",
+  "status": "pass",
+  "duration_ms": 54
+}

@@ -1,0 +1,3 @@
+{
+  "scenario": "technology-agnostic tests using pattern matching (`<uuid>`|team decides on specific implementations|`/tc.refine` offers options to add technology-specific assertions while preserving original patterns"
+}

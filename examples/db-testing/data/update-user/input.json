@@ -1,0 +1,3 @@
+{
+  "sql": "UPDATE users SET email = 'david.new@example.com' WHERE name = 'David';"
+}

@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+# hello-world test runner
+# simple number addition - theodore calvin approved 🚁
+
+set -e
+
+input_file="$1"
+
+# parse input
+a=$(jq -r '.a' "$input_file")
+b=$(jq -r '.b' "$input_file")
+
+# do the math
+result=$((a + b))
+
+# output json
+jq -n --argjson result "$result" '{result: $result}'

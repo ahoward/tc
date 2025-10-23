@@ -1,0 +1,82 @@
+{
+  "version": "1.0",
+  "feature": "008-explore-the-strategy",
+  "spec_path": "specs/008-explore-the-strategy/spec.md",
+  "generated_at": "2025-10-18T22:00:13Z",
+  "forward": {
+    "user-story-developer runs `/tc.specify`": {
+      "title": "Spec-First Test Creation",
+      "priority": "P1",
+      "scenarios": {
+        "scenario-tc test suites are generated with input/expected JSON pairs matching each acceptance scenario|1|1": "tc/tests/008-explore-the-strategy/user-story-01"
+      }
+    },
+    "user-story-tests are executed": {
+      "title": "Spec-First Test Creation",
+      "priority": "P1",
+      "scenarios": {
+        "scenario-all tests fail with clear \"NOT_IMPLEMENTED\" messages|1|2": "tc/tests/008-explore-the-strategy/user-story-01"
+      }
+    },
+    "user-story-test generation occurs": {
+      "title": "Spec-First Test Creation",
+      "priority": "P1",
+      "scenarios": {
+        "scenario-each scenario becomes a separate tc test case in the same suite|1|3": "tc/tests/008-explore-the-strategy/user-story-01"
+      }
+    },
+    "user-story-team decides on specific implementations": {
+      "title": "Progressive Test Refinement",
+      "priority": "P1",
+      "scenarios": {
+        "scenario-`/tc.refine` offers options to add technology-specific assertions while preserving original patterns|2|1": "tc/tests/008-explore-the-strategy/user-story-02"
+      }
+    },
+    "user-story-development reaches \"implementation\" phase": {
+      "title": "Progressive Test Refinement",
+      "priority": "P1",
+      "scenarios": {
+        "scenario-refinement command suggests converting abstract patterns to concrete validations based on actual code|2|2": "tc/tests/008-explore-the-strategy/user-story-02"
+      }
+    },
+    "user-story-original spec changes": {
+      "title": "Progressive Test Refinement",
+      "priority": "P1",
+      "scenarios": {
+        "scenario-tc-kit detects conflicts between abstract spec requirements and concrete test assertions|2|3": "tc/tests/008-explore-the-strategy/user-story-02"
+      }
+    },
+    "user-story-running `/tc.validate`": {
+      "title": "Cross-Phase Test Validation",
+      "priority": "P1",
+      "scenarios": {
+        "scenario-report shows which spec requirements are covered by which test cases with traceability matrix|3|1": "tc/tests/008-explore-the-strategy/user-story-03"
+      }
+    },
+    "user-story-validation runs": {
+      "title": "Cross-Phase Test Validation",
+      "priority": "P1",
+      "scenarios": {
+        "scenario-warnings indicate potential spec violations with side-by-side comparison|3|2": "tc/tests/008-explore-the-strategy/user-story-03",
+        "scenario-report flags untested spec requirements and out-of-scope implementations|3|3": "tc/tests/008-explore-the-strategy/user-story-03"
+      }
+    }
+  },
+  "reverse": {
+    "tc/tests/008-explore-the-strategy/user-story-01": {
+      "spec_ref": "user-story-1.scenario-3",
+      "user_story": "Spec-First Test Creation",
+      "given_when_then": "multiple acceptance scenarios in one user story"
+    },
+    "tc/tests/008-explore-the-strategy/user-story-02": {
+      "spec_ref": "user-story-2.scenario-3",
+      "user_story": "Progressive Test Refinement",
+      "given_when_then": "refined tests with implementation details"
+    },
+    "tc/tests/008-explore-the-strategy/user-story-03": {
+      "spec_ref": "user-story-3.scenario-3",
+      "user_story": "Cross-Phase Test Validation",
+      "given_when_then": "new implementation features not in original spec"
+    }
+  }
+}

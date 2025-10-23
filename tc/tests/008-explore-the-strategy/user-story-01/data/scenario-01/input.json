@@ -1,0 +1,3 @@
+{
+  "scenario": "a spec-kit specification with user stories and acceptance criteria|developer runs `/tc.specify`|tc test suites are generated with input/expected JSON pairs matching each acceptance scenario"
+}

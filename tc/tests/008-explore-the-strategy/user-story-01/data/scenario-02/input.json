@@ -1,0 +1,3 @@
+{
+  "scenario": "generated test suites without implementation|tests are executed|all tests fail with clear \"NOT_IMPLEMENTED\" messages"
+}

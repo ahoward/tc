@@ -1,0 +1,3 @@
+{
+  "scenario": "multiple acceptance scenarios in one user story|test generation occurs|each scenario becomes a separate tc test case in the same suite"
+}

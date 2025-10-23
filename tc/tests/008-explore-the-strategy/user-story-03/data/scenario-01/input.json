@@ -1,0 +1,3 @@
+{
+  "scenario": "original spec-derived tests and refined implementation tests|running `/tc.validate`|report shows which spec requirements are covered by which test cases with traceability matrix"
+}

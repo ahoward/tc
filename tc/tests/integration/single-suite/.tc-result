@@ -1,0 +1,8 @@
+{
+  "suite": "single-suite",
+  "scenario": "passing-suite",
+  "status": "pass",
+  "duration_ms": 200,
+  "timestamp": "2025-10-17T22:55:43Z",
+  "comparison_mode": "semantic_json"
+}

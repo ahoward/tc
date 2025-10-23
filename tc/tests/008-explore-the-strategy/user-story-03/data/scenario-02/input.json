@@ -1,0 +1,3 @@
+{
+  "scenario": "implementation tests that pass but refined tests that changed behavior|validation runs|warnings indicate potential spec violations with side-by-side comparison"
+}

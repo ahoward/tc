@@ -1,0 +1,3 @@
+{
+  "scenario": "refined tests with implementation details|original spec changes|tc-kit detects conflicts between abstract spec requirements and concrete test assertions"
+}

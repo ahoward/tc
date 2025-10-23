@@ -1,0 +1,8 @@
+{
+  "version": "1.0",
+  "suites": {},
+  "transition_rules": {
+    "concept_to_exploration": "First implementation commit detected",
+    "exploration_to_implementation": "5+ consecutive passing runs"
+  }
+}

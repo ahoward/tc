@@ -1,0 +1,16 @@
+{
+  "name": "dao-demo",
+  "version": "0.1.0",
+  "description": "Multi-language DAO demo - JavaScript implementation",
+  "type": "module",
+  "main": "lib/dao.js",
+  "scripts": {
+    "test": "echo \"Run tc test suite\" && exit 0"
+  },
+  "dependencies": {
+    "uuid": "^9.0.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

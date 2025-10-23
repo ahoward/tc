@@ -1,0 +1,24 @@
+{
+  "suite": "json-comparison",
+  "scenario": "different-values",
+  "status": "pass",
+  "duration_ms": 49,
+  "timestamp": "2025-10-17T22:55:44Z",
+  "comparison_mode": "semantic_json"
+}
+{
+  "suite": "json-comparison",
+  "scenario": "exact-match",
+  "status": "pass",
+  "duration_ms": 52,
+  "timestamp": "2025-10-17T22:55:44Z",
+  "comparison_mode": "semantic_json"
+}
+{
+  "suite": "json-comparison",
+  "scenario": "order-independent",
+  "status": "pass",
+  "duration_ms": 43,
+  "timestamp": "2025-10-17T22:55:44Z",
+  "comparison_mode": "semantic_json"
+}

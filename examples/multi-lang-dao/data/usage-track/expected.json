@@ -1,0 +1,9 @@
+{
+  "id": "<uuid>",
+  "status": "completed",
+  "result": {
+    "tracked": true,
+    "operation": "/prompt/generate",
+    "timestamp": "<timestamp>"
+  }
+}
