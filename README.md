@@ -77,7 +77,7 @@ tc is a dead-simple testing framework that lets you:
 
 ## philosophy
 
-**simple** • **portable** • **language-agnostic** • **unix** • **spec-driven**
+**simple** • **portable** • **language-agnostic** • **unix**
 
 🤖 **In the AI age, specifications and tests are permanent while implementations are disposable.**
 
@@ -230,26 +230,28 @@ Then use in expected.json:
 - [ ] pattern-based selection
 - [ ] distributed test execution
 
-## ai-driven development
+## optional: tc-kit addon
 
-**[→ tc-kit: AI-driven testing](AI.md)** ⚠️ **EXPERIMENTAL**
+**[→ tc-kit: Spec-driven testing](tc-kit/README.md)** ⚠️ **EXPERIMENTAL**
 
-tc-kit integrates with spec-kit for automatic test generation from specifications. Perfect for AI-assisted development workflows where specs and tests are permanent while implementations are disposable.
+tc-kit is an optional addon in `tc-kit/` that integrates with spec-kit for automatic test generation from specifications. Perfect for AI-assisted development workflows.
+
+**Use tc-kit if**: You want spec-first development with automatic test generation
+**Skip tc-kit if**: You just want a simple test runner (use tc core)
 
 Quick start:
 ```bash
 # Generate tests from spec
-/tc.specify
+tc-kit/.specify/scripts/bash/tc-kit-specify.sh --spec tc-kit/specs/my-feature/spec.md
 
 # Implement to pass tests
-edit tc/tests/my-feature/user-story-01/run
+vim tc/tests/my-feature/user-story-01/run
 
-# Validate & refine
-/tc.validate
-/tc.refine
+# Run tests
+tc tc/tests/my-feature
 ```
 
-See **[AI.md](AI.md)** for full documentation.
+See **[tc-kit/README.md](tc-kit/README.md)** for full documentation.
 
 ## installation
 
