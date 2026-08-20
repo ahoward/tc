@@ -76,6 +76,20 @@ tc_parse_runner_output() {
 }
 
 # cleanup temp files
+# a bounded excerpt of what the runner said on stderr.
+#
+# runner.sh captures stderr to a file and hands the path back; the failure paths
+# in executor.sh used to delete it without reading it, so a runner that exited
+# non-zero reported "exit code 1" and nothing else. hooks.sh has read failing
+# stderr this way (up to 10KB) since the beginning — this makes runners match.
+tc_runner_stderr() {
+    local stderr_file="${1:-}" max="${2:-10240}"
+
+    [ -n "$stderr_file" ] && [ -s "$stderr_file" ] || return 0
+    # pipes would break the IFS='|' parse of the result line this ends up in
+    head -c "$max" "$stderr_file" | tr '|' ':'
+}
+
 tc_cleanup_runner_output() {
     local output_file="$1"
     local stderr_file="${2:-}"

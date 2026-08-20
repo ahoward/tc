@@ -128,7 +128,13 @@ tc_execute_suite() {
             [ "$TC_STATUS_MODE" != "tty" ] && tc_progress_fail
             tc_error "timeout after ${timeout}s"
             ((errors++))
-            results+=("$scenario_name|timeout|$duration|exceeded timeout")
+            local stderr_text=$(tc_runner_stderr "$stderr_file")
+            if [ -n "$stderr_text" ]; then
+                tc_error "runner stderr:"
+                printf '%s\n' "$stderr_text" | sed 's/^/    /' >&2
+            fi
+            results+=("$scenario_name|timeout|$duration|exceeded timeout${stderr_text:+
+$stderr_text}")
             tc_cleanup_runner_output "$output_file" "$stderr_file"
             # Update status line after failure
             tc_status_update "$suite_name" "$scenario_name" "failed" "$passed" "$((failed + errors))"
@@ -144,12 +150,20 @@ tc_execute_suite() {
             [ "$TC_STATUS_MODE" != "tty" ] && tc_progress_fail
             tc_error "runner exited with code $exit_code"
             ((errors++))
-            results+=("$scenario_name|error|$duration|exit code $exit_code")
+            # the runner already said why; print it instead of deleting it (#5)
+            local stderr_text=$(tc_runner_stderr "$stderr_file")
+            if [ -n "$stderr_text" ]; then
+                tc_error "runner stderr:"
+                printf '%s\n' "$stderr_text" | sed 's/^/    /' >&2
+            fi
+            results+=("$scenario_name|error|$duration|exit code $exit_code${stderr_text:+
+$stderr_text}")
             tc_cleanup_runner_output "$output_file" "$stderr_file"
             # Update status line after failure
             tc_status_update "$suite_name" "$scenario_name" "failed" "$passed" "$((failed + errors))"
             # Write to log (T054, T055)
-            tc_log_write "$suite_dir" "$scenario_name" "error" "$duration" "exit code $exit_code"
+            tc_log_write "$suite_dir" "$scenario_name" "error" "$duration" "exit code $exit_code${stderr_text:+
+$stderr_text}"
 
             # Fail-fast in TTY mode: stop immediately on first failure
             if [ "$TC_STATUS_MODE" = "tty" ]; then
